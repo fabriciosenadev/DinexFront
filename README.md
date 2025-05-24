@@ -69,4 +69,4 @@ Este projeto utiliza `Karma + Jasmine` para testes unitários.
 ---
 
 **Licença:** MIT  
-**Autor:** [Seu Nome ou Equipe Dinex]
+**Autor:** Fabricio R. Sena
