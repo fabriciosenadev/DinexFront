@@ -1,27 +1,72 @@
 # DinexFront
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.1.
+Frontend para o sistema de gestão financeira e investimentos **Dinex**, desenvolvido com Angular 18 e Bootstrap 5.
 
-## Development server
+## 🧱 Tecnologias principais
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- [Angular 18](https://angular.dev/)
+- [Bootstrap 5](https://getbootstrap.com/)
+- RxJS, SCSS, Lazy Modules
+- Integração com backend `.NET 8` via API REST
+- Arquitetura modular (`core`, `shared`, `features`, `state`)
+- Sem uso de Angular Material (por preferência de produtividade)
 
-## Code scaffolding
+## 🚀 Como rodar localmente
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. Instale as dependências:
 
-## Build
+   ```bash
+   npm install
+   ```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+2. Rode o servidor de desenvolvimento:
 
-## Running unit tests
+   ```bash
+   ng serve
+   ```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+3. Acesse no navegador:
 
-## Running end-to-end tests
+   ```
+   http://localhost:4200/
+   ```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+> A aplicação recarrega automaticamente ao salvar qualquer alteração.
 
-## Further help
+## 📁 Estrutura do projeto
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```
+src/
+├── app/
+│   ├── core/         # Serviços globais, interceptors, guards
+│   ├── shared/       # Componentes e pipes reutilizáveis
+│   ├── features/     # Módulos de domínio (wallets, assets, etc.)
+│   ├── state/        # NgRx state (actions, reducers, effects)
+│   ├── app.module.ts
+│   └── app-routing.module.ts
+```
+
+## 📦 Scripts úteis
+
+- `ng generate component <nome>` — Gera um novo componente
+- `ng build` — Compila a aplicação para produção
+- `ng test` — Executa testes unitários com Karma
+
+## 🧪 Testes
+
+Este projeto utiliza `Karma + Jasmine` para testes unitários.
+
+> *(Opcional: poderá futuramente usar `Cypress` para testes E2E.)*
+
+## 🛠️ Contribuindo
+
+1. Faça um fork
+2. Crie sua branch: `git checkout -b minha-feature`
+3. Commit: `git commit -m 'feat: adiciona nova feature'`
+4. Push: `git push origin minha-feature`
+5. Abra um Pull Request 🚀
+
+---
+
+**Licença:** MIT  
+**Autor:** [Seu Nome ou Equipe Dinex]
