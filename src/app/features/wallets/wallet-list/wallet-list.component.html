@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h4 class="mb-3">Minhas Carteiras</h4>
+
+  <div *ngFor="let wallet of wallets" class="card mb-3">
+    <div class="card-body">
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <h5 class="card-title mb-0">{{ wallet.name }}</h5>
+        </div>
+        <div class="col-md-6 text-md-end text-muted">
+          <span>Saldo: R$ {{ wallet.balance | number: '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="edit(wallet.id)">
+          <i class="bi bi-pencil me-1"></i> Editar
+        </button>
+        <button class="btn btn-outline-danger btn-sm" (click)="delete(wallet.id)">
+          <i class="bi bi-trash me-1"></i> Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
