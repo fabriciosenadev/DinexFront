@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private tokenKey = 'auth_token';
-  private readonly apiUrl = 'https://localhost:5001/v1'; // ajuste para sua base real
+  private tokenKey = 'dinex::token';
 
-  constructor(private http: HttpClient) {}
+  constructor(private api: ApiService) {}
 
   login(email: string, password: string): Observable<void> {
-    return this.http
-      .post<{ token: string }>(`${this.apiUrl}/users/login`, { email, password })
+    return this.api
+      .post<{ token: string }>('users/login', { email, password })
       .pipe(
         tap(response => localStorage.setItem(this.tokenKey, response.token)),
         map(() => {}) // transforma em Observable<void>
