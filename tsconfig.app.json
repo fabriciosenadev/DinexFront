@@ -4,7 +4,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [],
+    "experimentalDecorators": true,
+    "target": "ES2022",
+    "useDefineForClassFields": false
+  },
+  "angularCompilerOptions": {
+    "enableControlFlow": true
   },
   "files": [
     "src/main.ts"
@@ -13,3 +19,4 @@
     "src/**/*.d.ts"
   ]
 }
+

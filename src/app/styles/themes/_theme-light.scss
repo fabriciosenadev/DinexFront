@@ -1,0 +1,48 @@
+// _theme-light.scss
+
+$primary: #2563EB;        // Azul principal
+$secondary: #3B82F6;      // Azul claro
+$success: #10B981;        // Verde sucesso
+$danger: #EF4444;         // Vermelho erro
+$warning: #FBBF24;        // Amarelo alerta
+$info: #0EA5E9;           // Azul informação
+
+$gray-100: #F3F4F6;
+$gray-900: #111827;
+$background-color: #FFFFFF;
+$text-color: #111827;
+
+body.light-theme {
+  background-color: $background-color;
+  color: $text-color;
+
+  .card {
+    background-color: $background-color;
+    color: $text-color;
+  }
+
+  .navbar {
+    background-color: $primary;
+    color: white;
+  }
+
+  .btn-outline-primary {
+    color: $primary;
+    border-color: $primary;
+
+    &:hover {
+      background-color: $primary;
+      color: white;
+    }
+  }
+
+  .btn-outline-danger {
+    color: $danger;
+    border-color: $danger;
+
+    &:hover {
+      background-color: $danger;
+      color: white;
+    }
+  }
+}
