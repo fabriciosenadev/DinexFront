@@ -1,0 +1,14 @@
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">DinexFront</a>
+    <button class="btn btn-outline-light ms-auto" (click)="toggleTheme()">
+      @if (isDarkTheme) {
+        <i class="bi bi-sun"></i>
+      } @else {
+        <i class="bi bi-moon"></i>
+      }
+      <span class="ms-2">Alternar tema</span>
+    </button>
+  </div>
+</nav>
