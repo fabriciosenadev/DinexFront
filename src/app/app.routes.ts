@@ -12,6 +12,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: 'wallets/new', component: WalletFormComponent },
+  { path: 'wallets/:id', component: WalletFormComponent },
   { path: '', redirectTo: 'wallets', pathMatch: 'full' },
   { path: '**', redirectTo: 'wallets' },
 ];
