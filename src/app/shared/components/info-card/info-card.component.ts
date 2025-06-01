@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-dashboard-card',
+  selector: 'app-info-card',
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -19,9 +19,9 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styleUrls: ['./dashboard-card.component.scss']
+  styleUrls: ['./info-card.component.scss']
 })
-export class DashboardCardComponent {
+export class InfoCardComponent {
   @Input() title!: string;
   @Input() value!: string;
   @Input() icon?: string;

@@ -46,4 +46,29 @@ body.dark-theme {
       color: white;
     }
   }
+
+  .text-muted {
+    color: #cbd5e1 !important; // um cinza claro e visível sobre fundo escuro
+  }
+
+  .modal-content {
+    background-color: #1e293b;
+    color: #f1f5f9;
+    border-color: #334155;
+  }
+
+  .modal-header {
+    background-color: #dc3545; // vermelho padrão Bootstrap
+    color: white;
+    border-bottom-color: #b02a37;
+  }
+
+  .modal-footer {
+    background-color: transparent;
+    border-top-color: #334155;
+  }
+
+  .btn-close {
+    filter: invert(1); // deixa o botão X visível sobre fundo escuro
+  }
 }
