@@ -12,10 +12,6 @@
       <input type="password" id="password" class="form-control" formControlName="password">
     </div>
 
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
     <button type="submit" class="btn btn-primary w-100" [disabled]="form.invalid">
       Entrar
     </button>

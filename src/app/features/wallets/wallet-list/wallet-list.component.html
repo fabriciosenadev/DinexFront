@@ -13,10 +13,6 @@
     </div>
   </div>
 
-  <div *ngIf="errorMessage" class="alert alert-danger">
-    {{ errorMessage }}
-  </div>
-
   <div *ngIf="!loading && wallets.length === 0" class="alert alert-info">
     Nenhuma carteira encontrada.
   </div>

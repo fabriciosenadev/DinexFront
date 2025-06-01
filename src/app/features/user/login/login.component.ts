@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -13,12 +14,12 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class LoginComponent {
   form: FormGroup;
-  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notification: NotificationService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -32,12 +33,15 @@ export class LoginComponent {
 
       this.authService.login(email, password).subscribe({
         next: () => {
+          this.notification.success('Login realizado com sucesso!');
           this.router.navigate(['/wallets']);
         },
         error: () => {
-          this.errorMessage = 'E-mail ou senha inválidos.';
+          this.notification.error('E-mail ou senha inválidos.');
         },
       });
+    } else {
+      this.form.markAllAsTouched();
     }
   }
 }

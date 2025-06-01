@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WalletService } from '../../../core/services/wallet.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-wallet-form',
@@ -21,7 +22,8 @@ export class WalletFormComponent implements OnInit {
     private fb: FormBuilder,
     private walletService: WalletService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private notification: NotificationService,
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -43,7 +45,7 @@ export class WalletFormComponent implements OnInit {
           });
         },
         error: () => {
-          console.error('Erro ao carregar carteira.');
+          this.notification.error('Erro ao carregar carteira.');
           this.router.navigate(['/wallets']);
         },
       });
@@ -53,18 +55,29 @@ export class WalletFormComponent implements OnInit {
   submit(): void {
     if (this.form.valid) {
       const data = this.form.value;
+
       if (this.isEditing && this.walletId) {
         this.walletService.updateWallet(this.walletId, {
           id: this.walletId,
           ...data
         }).subscribe({
-          next: () => this.router.navigate(['/wallets']),
-          error: () => console.error('Erro ao atualizar carteira.'),
+          next: () => {
+            this.notification.success('Carteira atualizada com sucesso!');
+            this.router.navigate(['/wallets']);
+          },
+          error: () => {
+            this.notification.error('Erro ao atualizar carteira.');
+          },
         });
       } else {
         this.walletService.createWallet(data).subscribe({
-          next: () => this.router.navigate(['/wallets']),
-          error: () => console.error('Erro ao criar carteira.'),
+          next: () => {
+            this.notification.success('Carteira criada com sucesso!');
+            this.router.navigate(['/wallets']);
+          },
+          error: () => {
+            this.notification.error('Erro ao criar carteira.');
+          },
         });
       }
     } else {

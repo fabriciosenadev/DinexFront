@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Wallet, WalletService } from '../../../core/services/wallet.service';
 import { RouterLink } from '@angular/router';
+import { NotificationService } from '../../../core/services/notification.service';
 
 declare var bootstrap: any;
 
@@ -15,12 +16,12 @@ declare var bootstrap: any;
 export class WalletListComponent implements OnInit {
   wallets: Wallet[] = [];
   loading = false;
-  errorMessage: string | null = null;
   selectedWalletToDelete: Wallet | null = null;
 
   constructor(
     private walletService: WalletService,
-  ) { }
+    private notification: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
@@ -31,14 +32,10 @@ export class WalletListComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.errorMessage = 'Erro ao carregar carteiras.';
+        this.notification.error('Erro ao carregar carteiras.');
         this.loading = false;
       },
     });
-  }
-
-  edit(walletId: number): void {
-    console.log('Editar carteira:', walletId);
   }
 
   confirmDelete(wallet: Wallet): void {
@@ -56,13 +53,13 @@ export class WalletListComponent implements OnInit {
 
     this.walletService.deleteWallet(this.selectedWalletToDelete.id).subscribe({
       next: () => {
+        this.notification.success('Carteira excluída com sucesso!');
         this.wallets = this.wallets.filter(w => w.id !== this.selectedWalletToDelete?.id);
         this.selectedWalletToDelete = null;
       },
       error: () => {
-        console.error('Erro ao excluir carteira.');
+        this.notification.error('Erro ao excluir carteira.');
       },
     });
   }
-
 }
