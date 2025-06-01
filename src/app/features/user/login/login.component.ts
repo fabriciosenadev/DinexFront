@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { FeedbackMessagesService } from '../../../core/services/feedback-messages.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private feedback: FeedbackMessagesService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -33,11 +35,11 @@ export class LoginComponent {
 
       this.authService.login(email, password).subscribe({
         next: () => {
-          this.notification.success('Login realizado com sucesso!');
+          this.notification.success(this.feedback.get('auth', 'loginSuccess'));
           this.router.navigate(['/wallets']);
         },
         error: () => {
-          this.notification.error('E-mail ou senha inválidos.');
+          this.notification.error(this.feedback.get('auth', 'loginError'));
         },
       });
     } else {

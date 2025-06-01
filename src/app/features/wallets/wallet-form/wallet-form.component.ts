@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { WalletService } from '../../../core/services/wallet.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { FeedbackMessagesService } from '../../../core/services/feedback-messages.service';
 
 @Component({
   selector: 'app-wallet-form',
@@ -24,6 +25,7 @@ export class WalletFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private notification: NotificationService,
+    private feedback: FeedbackMessagesService
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -45,7 +47,7 @@ export class WalletFormComponent implements OnInit {
           });
         },
         error: () => {
-          this.notification.error('Erro ao carregar carteira.');
+          this.notification.error(this.feedback.get('wallet', 'loadError'));
           this.router.navigate(['/wallets']);
         },
       });
@@ -62,21 +64,21 @@ export class WalletFormComponent implements OnInit {
           ...data
         }).subscribe({
           next: () => {
-            this.notification.success('Carteira atualizada com sucesso!');
+            this.notification.success(this.feedback.get('wallet', 'updateSuccess'));
             this.router.navigate(['/wallets']);
           },
           error: () => {
-            this.notification.error('Erro ao atualizar carteira.');
+            this.notification.error(this.feedback.get('wallet', 'updateError'));
           },
         });
       } else {
         this.walletService.createWallet(data).subscribe({
           next: () => {
-            this.notification.success('Carteira criada com sucesso!');
+            this.notification.success(this.feedback.get('wallet', 'createSuccess'));
             this.router.navigate(['/wallets']);
           },
           error: () => {
-            this.notification.error('Erro ao criar carteira.');
+            this.notification.error(this.feedback.get('wallet', 'createError'));
           },
         });
       }
