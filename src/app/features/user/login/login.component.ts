@@ -36,7 +36,7 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: () => {
           this.notification.success(this.feedback.get('auth', 'loginSuccess'));
-          this.router.navigate(['/wallets']);
+          this.router.navigate(['/dashboard']);
         },
         error: () => {
           this.notification.error(this.feedback.get('auth', 'loginError'));
