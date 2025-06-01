@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Wallet, WalletService } from '../../../core/services/wallet.service';
 
 @Component({
   selector: 'app-wallet-list',
@@ -9,14 +10,28 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./wallet-list.component.scss'],
 })
 export class WalletListComponent implements OnInit {
-  wallets = [
-    { id: 1, name: 'Carteira Principal', balance: 15000.00 },
-    { id: 2, name: 'Carteira Internacional', balance: 8200.50 },
-  ];
+  wallets: Wallet[] = [];
+  loading = false;
+  errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(
+    private walletService: WalletService,
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loading = true;
+
+    this.walletService.getUserWallets().subscribe({
+      next: (wallets) => {
+        this.wallets = wallets;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Erro ao carregar carteiras.';
+        this.loading = false;
+      },
+    });
+  }
 
   edit(walletId: number): void {
     console.log('Editar carteira:', walletId);

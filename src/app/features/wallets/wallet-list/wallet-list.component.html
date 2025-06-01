@@ -1,22 +1,39 @@
 <div class="container mt-4">
   <h4 class="mb-3">Minhas Carteiras</h4>
 
+  <div *ngIf="loading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && wallets.length === 0" class="alert alert-info">
+    Nenhuma carteira encontrada.
+  </div>
+
   <div *ngFor="let wallet of wallets" class="card mb-3">
     <div class="card-body">
       <div class="row mb-2">
         <div class="col-md-6">
           <h5 class="card-title mb-0">{{ wallet.name }}</h5>
+          <p class="card-text text-muted mb-0">
+            {{ wallet.description || 'Sem descrição' }}
+          </p>
         </div>
         <div class="col-md-6 text-md-end text-muted">
-          <span>Saldo: R$ {{ wallet.balance | number: '1.2-2' }}</span>
+          <span>Moeda: {{ wallet.defaultCurrency }}</span>
         </div>
       </div>
 
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" (click)="edit(wallet.id)">
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-outline-primary btn-sm">
           <i class="bi bi-pencil me-1"></i> Editar
         </button>
-        <button class="btn btn-outline-danger btn-sm" (click)="delete(wallet.id)">
+        <button class="btn btn-outline-danger btn-sm">
           <i class="bi bi-trash me-1"></i> Excluir
         </button>
       </div>
