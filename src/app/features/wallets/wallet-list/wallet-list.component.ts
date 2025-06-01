@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Wallet, WalletService } from '../../../core/services/wallet.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-wallet-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './wallet-list.component.html',
   styleUrls: ['./wallet-list.component.scss'],
 })

@@ -1,0 +1,48 @@
+<div class="container mt-4" style="max-width: 600px;">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome da Carteira</label>
+      <input
+        type="text"
+        id="name"
+        class="form-control"
+        formControlName="name"
+        [class.is-invalid]="form.get('name')?.touched && form.get('name')?.invalid"
+      />
+      <div *ngIf="form.get('name')?.touched && form.get('name')?.invalid" class="invalid-feedback">
+        O nome é obrigatório.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Descrição</label>
+      <textarea id="description" class="form-control" formControlName="description"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="defaultCurrency" class="form-label">Moeda Padrão</label>
+      <select
+        id="defaultCurrency"
+        class="form-select"
+        formControlName="defaultCurrency"
+        [class.is-invalid]="form.get('defaultCurrency')?.touched && form.get('defaultCurrency')?.invalid"
+      >
+        <option value="">Selecione...</option>
+        <option *ngFor="let currency of currencies" [value]="currency">
+          {{ currency }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('defaultCurrency')?.touched && form.get('defaultCurrency')?.invalid"
+        class="invalid-feedback"
+      >
+        Selecione uma moeda.
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+  </form>
+</div>

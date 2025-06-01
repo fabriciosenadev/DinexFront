@@ -17,4 +17,8 @@ export class WalletService {
   getUserWallets(): Observable<Wallet[]> {
     return this.api.get<Wallet[]>('wallets/user');
   }
+
+  createWallet(data: Omit<Wallet, 'id' | 'userId'>): Observable<Wallet> {
+    return this.api.post<Wallet>('wallets', data);
+  }
 }

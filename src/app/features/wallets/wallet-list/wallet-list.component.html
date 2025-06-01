@@ -1,6 +1,12 @@
 <div class="container mt-4">
   <h4 class="mb-3">Minhas Carteiras</h4>
 
+  <div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-success" [routerLink]="['/wallets/new']">
+      <i class="bi bi-plus-lg me-1"></i> Nova Carteira
+    </a>
+  </div>
+
   <div *ngIf="loading" class="text-center my-4">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Carregando...</span>
