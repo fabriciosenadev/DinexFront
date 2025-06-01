@@ -54,7 +54,10 @@ export class WalletFormComponent implements OnInit {
     if (this.form.valid) {
       const data = this.form.value;
       if (this.isEditing && this.walletId) {
-        this.walletService.updateWallet(this.walletId, data).subscribe({
+        this.walletService.updateWallet(this.walletId, {
+          id: this.walletId,
+          ...data
+        }).subscribe({
           next: () => this.router.navigate(['/wallets']),
           error: () => console.error('Erro ao atualizar carteira.'),
         });
