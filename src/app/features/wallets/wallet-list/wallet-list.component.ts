@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Wallet, WalletService } from '../../../core/services/wallet.service';
 import { RouterLink } from '@angular/router';
 import { NotificationService } from '../../../core/services/notification.service';
 import { FeedbackMessagesService } from '../../../core/services/feedback-messages.service';
+import { WalletService } from '../../../core/services/wallet.service';
+import { Wallet } from '../../../core/models/wallet.model';
 
 declare var bootstrap: any;
 
@@ -15,6 +16,8 @@ declare var bootstrap: any;
   styleUrls: ['./wallet-list.component.scss'],
 })
 export class WalletListComponent implements OnInit {
+  @ViewChild('deleteModal') deleteModalRef!: ElementRef;
+
   wallets: Wallet[] = [];
   loading = false;
   selectedWalletToDelete: Wallet | null = null;
@@ -43,11 +46,8 @@ export class WalletListComponent implements OnInit {
   confirmDelete(wallet: Wallet): void {
     this.selectedWalletToDelete = wallet;
 
-    const modalElement = document.getElementById('deleteModal');
-    if (modalElement) {
-      const modalInstance = new bootstrap.Modal(modalElement);
-      modalInstance.show();
-    }
+    const modalInstance = new bootstrap.Modal(this.deleteModalRef.nativeElement);
+    modalInstance.show();
   }
 
   deleteConfirmed(): void {

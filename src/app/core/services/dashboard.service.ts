@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { Wallet } from './wallet.service';
 import { ApiService } from './api.service';
+import { Wallet } from '../models/wallet.model';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {

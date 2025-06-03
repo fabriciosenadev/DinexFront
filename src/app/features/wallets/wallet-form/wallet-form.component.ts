@@ -18,6 +18,7 @@ export class WalletFormComponent implements OnInit {
   currencies = ['BRL', 'USD', 'EUR'];
   isEditing = false;
   walletId: string | null = null;
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -36,6 +37,13 @@ export class WalletFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.walletId = this.route.snapshot.paramMap.get('id');
+
+    if (this.walletId && !this.isValidUuid(this.walletId)) {
+      this.notification.error('ID de carteira inválido.');
+      this.router.navigate(['/wallets']);
+      return;
+    }
+
     if (this.walletId) {
       this.isEditing = true;
       this.walletService.getWalletById(this.walletId).subscribe({
@@ -55,6 +63,8 @@ export class WalletFormComponent implements OnInit {
   }
 
   submit(): void {
+    this.loading = true;
+
     if (this.form.valid) {
       const data = this.form.value;
 
@@ -65,20 +75,26 @@ export class WalletFormComponent implements OnInit {
         }).subscribe({
           next: () => {
             this.notification.success(this.feedback.get('wallet', 'updateSuccess'));
+            this.loading = false;
+
             this.router.navigate(['/wallets']);
           },
           error: () => {
             this.notification.error(this.feedback.get('wallet', 'updateError'));
+            this.loading = false;
           },
         });
       } else {
         this.walletService.createWallet(data).subscribe({
           next: () => {
             this.notification.success(this.feedback.get('wallet', 'createSuccess'));
+            this.loading = false;
+
             this.router.navigate(['/wallets']);
           },
           error: () => {
             this.notification.error(this.feedback.get('wallet', 'createError'));
+            this.loading = false;
           },
         });
       }
@@ -90,4 +106,10 @@ export class WalletFormComponent implements OnInit {
   cancel(): void {
     this.router.navigate(['/wallets']);
   }
+
+  //#region private methods
+  private isValidUuid(id: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  }
+  //#endregion
 }
