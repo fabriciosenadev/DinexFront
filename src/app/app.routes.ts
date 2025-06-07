@@ -12,6 +12,10 @@ export const routes: Routes = [
       { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
       { path: 'wallets', loadChildren: () => import('./features/wallets/wallets.routes').then(m => m.walletsRoutes) },
       { path: 'assets', loadChildren: () => import('./features/assets/assets.routes').then(m => m.assetsRoutes) },
+      {
+        path: 'operations',
+        loadChildren: () => import('./features/operations/operations.routes').then(m => m.operationsRoutes)
+      },
       // futuras rotas protegidas
     ],
   },

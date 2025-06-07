@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h4 class="mb-3">Operações</h4>
+
+  <div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-success" [routerLink]="['/operations/new']">
+      <i class="bi bi-plus-lg me-1"></i> Nova Operação
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+  }
+
+  @if (!loading && operations.length === 0) {
+    <div class="alert alert-info">Nenhuma operação encontrada.</div>
+  }
+
+  @for (op of operations; track op.id) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h5 class="card-title mb-0">{{ resolveTypeLabel(op.type) }}</h5>
+            <p class="mb-1 text-muted">Ativo ID: {{ op.assetId }}</p>
+            <p class="mb-1 text-muted">Carteira ID: {{ op.walletId }}</p>
+            <p class="mb-1 text-muted">
+              Quantidade: {{ op.quantity }}, Preço unitário: {{ op.unitPrice | currency: 'BRL':'symbol-narrow' }}
+            </p>
+            <p class="mb-1 text-muted">Total: R$ {{ op.totalValue?.toFixed(2) }}</p>
+            <p class="mb-1 text-muted">Data: {{ op.executedAt | date: 'shortDate' }}</p>
+          </div>
+          <div class="d-flex flex-column justify-content-start align-items-end gap-2">
+            <a class="btn btn-outline-primary btn-sm" [routerLink]="['/operations', op.id]">
+              <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
