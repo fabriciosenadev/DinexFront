@@ -6,7 +6,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 export class ApiService {
   private readonly apiUrl = 'https://localhost:5001/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   get<T>(path: string, params?: any, headers?: HttpHeaders): Observable<T> {
     return this.http
@@ -19,26 +19,40 @@ export class ApiService {
 
   post<T>(path: string, body: any, headers?: HttpHeaders): Observable<T> {
     return this.http
-      .post<T>(`${this.apiUrl}/${path}`, body, { headers })
+      .post<T>(`${this.apiUrl}/${path}`, body, {
+        headers: headers ?? this.defaultHeaders()
+      })
       .pipe(catchError(this.handleError));
   }
 
   put<T>(path: string, body: any, headers?: HttpHeaders): Observable<T> {
     return this.http
-      .put<T>(`${this.apiUrl}/${path}`, body, { headers })
+      .put<T>(`${this.apiUrl}/${path}`, body, {
+        headers: headers ?? this.defaultHeaders()
+      })
       .pipe(catchError(this.handleError));
   }
 
   patch<T>(path: string, body: any, headers?: HttpHeaders): Observable<T> {
     return this.http
-      .patch<T>(`${this.apiUrl}/${path}`, body, { headers })
+      .patch<T>(`${this.apiUrl}/${path}`, body, {
+        headers: headers ?? this.defaultHeaders()
+      })
       .pipe(catchError(this.handleError));
   }
 
   delete<T>(path: string, headers?: HttpHeaders): Observable<T> {
     return this.http
-      .delete<T>(`${this.apiUrl}/${path}`, { headers })
+      .delete<T>(`${this.apiUrl}/${path}`, {
+        headers: headers ?? this.defaultHeaders()
+      })
       .pipe(catchError(this.handleError));
+  }
+
+  private defaultHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
   }
 
   private buildParams(params: any): HttpParams {

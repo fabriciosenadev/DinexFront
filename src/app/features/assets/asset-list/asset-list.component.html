@@ -1,0 +1,40 @@
+<div class="container mt-4">
+  <h4 class="mb-3">Ativos Cadastrados</h4>
+
+  <div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-success" [routerLink]="['/assets/new']">
+      <i class="bi bi-plus-lg me-1"></i> Novo Ativo
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+  }
+
+  @if (!loading && assets.length === 0) {
+    <div class="alert alert-info">Nenhum ativo encontrado.</div>
+  }
+
+  @for (asset of assets; track asset.id) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title mb-1">{{ asset.name }} <small class="text-muted">({{ asset.code }})</small></h5>
+        <p class="mb-0">
+          Tipo: {{ asset.type }} | Bolsa: {{ asset.exchange }} | Moeda: {{ asset.currency }}
+        </p>
+        <p class="mb-1 text-muted" *ngIf="asset.sector">Setor: {{ asset.sector }}</p>
+        <p class="mb-1 text-muted" *ngIf="asset.cnpj">CNPJ: {{ asset.cnpj }}</p>
+
+        <div class="d-flex gap-2 mt-2">
+          <a class="btn btn-outline-primary btn-sm" [routerLink]="['/assets', asset.id]">
+            <i class="bi bi-pencil me-1"></i> Editar
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+</div>
