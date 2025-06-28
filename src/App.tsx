@@ -2,29 +2,35 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./shared/providers/AuthProvider";
 import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
+import PrivateRoute from "./shared/components/PrivateRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import PrivateRoute from "./shared/components/PrivateRoute";
+// import TesteNotificacao from "./pages/TesteNotificacao";
+import { Toaster } from "sonner"; // Importando Toaster do sonner
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Rotas públicas */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Login />} />
-            {/* outras rotas públicas */}
-          </Route>
-          {/* Rotas privadas (protegidas por auth) */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<PrivateLayout />}>
-              <Route path="/home" element={<Home />} />
-              {/* outras rotas privadas */}
+    <>
+    <Toaster position="top-right" offset={64} />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            {/* Rotas públicas */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Login />} />
+              {/* <Route path="/teste-notificacao" element={<TesteNotificacao />} /> */}
+              {/* outras rotas públicas */}
             </Route>
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Rotas privadas (protegidas por auth) */}
+            <Route element={<PrivateRoute />}>
+              <Route element={<PrivateLayout />}>
+                <Route path="/home" element={<Home />} />
+                {/* outras rotas privadas */}
+              </Route>
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </>
   );
 }
