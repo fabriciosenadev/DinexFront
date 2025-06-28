@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class FeedbackMessagesService {
-private readonly messages: any = {
+  private readonly messages: any = {
     wallet: {
       createSuccess: 'Carteira criada com sucesso!',
       updateSuccess: 'Carteira atualizada com sucesso!',
@@ -57,7 +57,17 @@ private readonly messages: any = {
       loginSuccess: 'Login realizado com sucesso!',
       loginError: 'E-mail ou senha inválidos.',
       logoutSuccess: 'Logout efetuado com sucesso.',
-    }
+    },
+
+    broker: {
+      createSuccess: 'Corretora cadastrada com sucesso!',
+      updateSuccess: 'Corretora atualizada com sucesso!',
+      deleteSuccess: 'Corretora removida com sucesso!',
+      loadError: 'Erro ao carregar corretoras.',
+      createError: 'Erro ao cadastrar corretora.',
+      updateError: 'Erro ao atualizar corretora.',
+      deleteError: 'Erro ao remover corretora.',
+    },
   };
 
   get(entity: keyof typeof this.messages, key: string): string {

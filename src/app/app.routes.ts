@@ -16,6 +16,10 @@ export const routes: Routes = [
         path: 'operations',
         loadChildren: () => import('./features/operations/operations.routes').then(m => m.operationsRoutes)
       },
+      {
+        path: 'brokers',
+        loadChildren: () => import('./features/brokers/brokers.routes').then(m => m.brokersRoutes)
+      },
       // futuras rotas protegidas
     ],
   },
