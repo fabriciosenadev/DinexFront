@@ -1,72 +1,69 @@
-# DinexFront
+# React + TypeScript + Vite
 
-Frontend para o sistema de gestão financeira e investimentos **Dinex**, desenvolvido com Angular 18 e Bootstrap 5.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🧱 Tecnologias principais
+Currently, two official plugins are available:
 
-- [Angular 18](https://angular.dev/)
-- [Bootstrap 5](https://getbootstrap.com/)
-- RxJS, SCSS, Lazy Modules
-- Integração com backend `.NET 8` via API REST
-- Arquitetura modular (`core`, `shared`, `features`, `state`)
-- Sem uso de Angular Material (por preferência de produtividade)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 🚀 Como rodar localmente
+## Expanding the ESLint configuration
 
-1. Instale as dependências:
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-   ```bash
-   npm install
-   ```
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-2. Rode o servidor de desenvolvimento:
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-   ```bash
-   ng serve
-   ```
-
-3. Acesse no navegador:
-
-   ```
-   http://localhost:4200/
-   ```
-
-> A aplicação recarrega automaticamente ao salvar qualquer alteração.
-
-## 📁 Estrutura do projeto
-
-```
-src/
-├── app/
-│   ├── core/         # Serviços globais, interceptors, guards
-│   ├── shared/       # Componentes e pipes reutilizáveis
-│   ├── features/     # Módulos de domínio (wallets, assets, etc.)
-│   ├── state/        # NgRx state (actions, reducers, effects)
-│   ├── app.module.ts
-│   └── app-routing.module.ts
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## 📦 Scripts úteis
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-- `ng generate component <nome>` — Gera um novo componente
-- `ng build` — Compila a aplicação para produção
-- `ng test` — Executa testes unitários com Karma
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## 🧪 Testes
-
-Este projeto utiliza `Karma + Jasmine` para testes unitários.
-
-> *(Opcional: poderá futuramente usar `Cypress` para testes E2E.)*
-
-## 🛠️ Contribuindo
-
-1. Faça um fork
-2. Crie sua branch: `git checkout -b minha-feature`
-3. Commit: `git commit -m 'feat: adiciona nova feature'`
-4. Push: `git push origin minha-feature`
-5. Abra um Pull Request 🚀
-
----
-
-**Licença:** MIT  
-**Autor:** Fabricio R. Sena
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
