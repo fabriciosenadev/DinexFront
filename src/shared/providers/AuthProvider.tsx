@@ -1,36 +1,41 @@
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import type { AuthUser } from "../../features/Auth/auth.service";
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Estado inicial já considera o localStorage
-    return !!localStorage.getItem("token");
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const data = localStorage.getItem("dinex:user-data");
+    return data ? JSON.parse(data) : null;
   });
 
+  const isAuthenticated = !!user;
+
   useEffect(() => {
-    const handler = () => setIsAuthenticated(!!localStorage.getItem("token"));
+    const handler = () => {
+      const data = localStorage.getItem("dinex:user-data");
+      setUser(data ? JSON.parse(data) : null);
+    };
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
-    setIsAuthenticated(true);
+  const login = (user: AuthUser) => {
+    localStorage.setItem("dinex:user-data", JSON.stringify(user));
+    setUser(user);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
+    localStorage.removeItem("dinex:user-data");
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -23,7 +23,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const data = await loginApi(email, password);
-      login(data.token);         // Atualiza contexto + localStorage
+      login(data);         // Atualiza contexto + localStorage
       notification.success("Login realizado com sucesso!");
       navigate("/home");         // Redireciona para rota protegida
     } catch (err: unknown) {

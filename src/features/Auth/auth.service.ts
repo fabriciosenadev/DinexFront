@@ -2,14 +2,18 @@
 
 import { api } from "../../shared/services/api";
 
-interface LoginResponse {
-  token: string;
-  // Adicione outros campos que seu backend retornar (user, refreshToken, etc)
-}
+type LoginResponse = AuthUser;
 
 interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface AuthUser {
+  id: string;
+  fullName: string;
+  email: string;
+  token: string;
 }
 
 export async function login(email: string, password: string) {

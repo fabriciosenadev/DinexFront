@@ -1,5 +1,9 @@
+import type { AuthUser } from "../../features/Auth/auth.service";
+
+
 export interface AuthContextProps {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  user: AuthUser | null;
+  login: (user: AuthUser) => void;
   logout: () => void;
 }
