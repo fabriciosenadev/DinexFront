@@ -60,9 +60,9 @@ export default function BrokerList() {
                             <tbody>
                                 {brokers.map((b) => (
                                     <tr key={b.id} className="border-t border-slate-700 hover:bg-slate-700/50">
-                                        <td className="p-3">{b.name}</td>
-                                        <td className="p-3">{maskCnpj(b.cnpj)}</td>
-                                        <td className="p-3">
+                                        <td className="p-3 whitespace-nowrap">{b.name}</td>
+                                        <td className="p-3 whitespace-nowrap">{maskCnpj(b.cnpj)}</td>
+                                        <td className="p-3 whitespace-nowrap">
                                             {b.website
                                                 ? <a className="text-blue-400 hover:underline" href={b.website} target="_blank" rel="noopener noreferrer">{b.website}</a>
                                                 : "-"}
