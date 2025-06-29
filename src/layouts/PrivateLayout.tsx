@@ -2,6 +2,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../shared/hooks/useAuth";
 import { notification } from "../shared/services/notification";
 import { useState } from "react";
+import { LogOut } from "lucide-react";
+
 
 export default function PrivateLayout() {
   const { logout } = useAuth();
@@ -52,20 +54,7 @@ export default function PrivateLayout() {
           ) : (
             <>
               {/* Ícone de logout do Heroicons */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
-                />
-              </svg>
+              <LogOut className="w-5 h-5" />
               Sair
             </>
           )}

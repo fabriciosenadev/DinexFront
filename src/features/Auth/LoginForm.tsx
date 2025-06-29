@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { login as loginApi } from "./auth.service";
 import { useAuth } from "../../shared/hooks/useAuth";
 import { notification } from "../../shared/services/notification";
+import { LogIn } from "lucide-react";
+
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -91,7 +93,10 @@ export default function LoginForm() {
             Entrando...
           </>
         ) : (
-          "Entrar"
+          <>
+            <LogIn className="w-5 h-5 mr-2" />
+            Entrar
+          </>
         )}
       </button>
     </form>
