@@ -29,10 +29,15 @@ async function request<T, B = unknown>(
 ): Promise<T> {
   const { params, headers, ...rest } = options;
   const url = `${API_URL}/${path}${buildQuery(params)}`;
+
+  // Busca o token salvo no localStorage
+  const token = localStorage.getItem("token");
+
   const config: RequestInit = {
     method,
     headers: {
       "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...(headers || {}),
     },
     ...rest,

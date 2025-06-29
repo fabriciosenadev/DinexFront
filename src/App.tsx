@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 // import TesteNotificacao from "./pages/TesteNotificacao";
 import { Toaster } from "sonner"; // Importando Toaster do sonner
+import BrokersPage from "./pages/BrokersPage";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <Route element={<PrivateRoute />}>
               <Route element={<PrivateLayout />}>
                 <Route path="/home" element={<Home />} />
+                <Route path="/brokers" element={<BrokersPage />} />
                 {/* outras rotas privadas */}
               </Route>
             </Route>
