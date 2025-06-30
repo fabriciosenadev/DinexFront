@@ -8,11 +8,12 @@ import Home from "./pages/Home";
 // import TesteNotificacao from "./pages/TesteNotificacao";
 import { Toaster } from "sonner"; // Importando Toaster do sonner
 import BrokersPage from "./pages/BrokersPage";
+import WalletsPage from "./pages/WalletsPage";
 
 export default function App() {
   return (
     <>
-    <Toaster position="top-right" offset={64} />
+    <Toaster position="top-right" offset={80} />
       <BrowserRouter>
         <AuthProvider>
           <Routes>
@@ -27,6 +28,7 @@ export default function App() {
               <Route element={<PrivateLayout />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/brokers" element={<BrokersPage />} />
+                <Route path="/wallets" element={<WalletsPage />}/>
                 {/* outras rotas privadas */}
               </Route>
             </Route>

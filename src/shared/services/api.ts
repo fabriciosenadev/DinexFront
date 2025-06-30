@@ -1,5 +1,7 @@
 // src/shared/services/api.ts
 
+import { getUserToken } from "../utils/authUser";
+
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface RequestOptions extends RequestInit {
@@ -31,7 +33,7 @@ async function request<T, B = unknown>(
   const url = `${API_URL}/${path}${buildQuery(params)}`;
 
   // Busca o token salvo no localStorage
-  const token = localStorage.getItem("token");
+  const token = getUserToken();
 
   const config: RequestInit = {
     method,
