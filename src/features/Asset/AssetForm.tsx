@@ -8,36 +8,7 @@ import type { AssetDTO, CreateAssetCommand, UpdateAssetCommand } from "./asset.m
 import { maskCnpj, unmaskCnpj } from "../../shared/utils/cnpjMask";
 import { EXCHANGE_OPTIONS, CURRENCY_OPTIONS, ASSET_TYPE_OPTIONS } from "./asset.enums"
 import type { Exchange, Currency, AssetType } from "./asset.enums";
-
-// const EXCHANGE_OPTIONS = [
-//     { value: 0, label: "B3" },
-//     { value: 1, label: "NYSE" },
-//     { value: 2, label: "NASDAQ" },
-//     { value: 3, label: "AMEX" },
-//     { value: 4, label: "LSE" },
-//     { value: 5, label: "TSE" },
-//     { value: 6, label: "Outra" },
-// ] as const;
-
-// const CURRENCY_OPTIONS = [
-//     { value: 0, label: "BRL" },
-//     { value: 1, label: "USD" },
-//     { value: 2, label: "EUR" },
-//     { value: 3, label: "GBP" },
-//     { value: 4, label: "JPY" },
-//     { value: 5, label: "CHF" },
-//     { value: 6, label: "Outra" },
-// ] as const;
-
-// const ASSET_TYPE_OPTIONS = [
-//     { value: 0, label: "Acao" },
-//     { value: 1, label: "FII" },
-//     { value: 2, label: "ETF" },
-//     { value: 3, label: "BDR" },
-//     { value: 4, label: "RendaFixa" },
-//     { value: 5, label: "Cripto" },
-//     { value: 6, label: "Outro" },
-// ] as const;
+import { labelToAssetType, labelToCurrency, labelToExchange } from "./asset.helpers";
 
 type AssetFormProps = {
     asset?: AssetDTO | null;
@@ -60,9 +31,9 @@ export default function AssetForm({ asset, onSuccess, onCancel }: AssetFormProps
             setName(asset.name);
             setCode(asset.code);
             setCnpj(asset.cnpj ?? "");
-            setExchange(EXCHANGE_OPTIONS.find(opt => opt.label === asset.exchange)?.value ?? 0);
-            setCurrency(CURRENCY_OPTIONS.find(opt => opt.label === asset.currency)?.value ?? 0);
-            setType(ASSET_TYPE_OPTIONS.find(opt => opt.label === asset.type)?.value ?? 0);
+            setExchange(labelToExchange(asset.exchange));
+            setCurrency(labelToCurrency(asset.currency));
+            setType(labelToAssetType(asset.type));
             setSector(asset.sector ?? "");
         } else {
             setName("");
