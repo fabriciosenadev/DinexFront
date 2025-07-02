@@ -1,4 +1,4 @@
-import BrokerList from "../features/Brokers/BrokerList";
+import BrokerList from "../features/Broker/BrokerList";
 
 export default function BrokersPage() {
   return (

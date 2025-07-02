@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getWallets, deleteWallet, type WalletDTO } from "../features/Wallets/wallet.service";
-import WalletForm from "../features/Wallets/WalletForm";
+import { getWallets, deleteWallet, type WalletDTO } from "../features/Wallet/wallet.service";
+import WalletForm from "../features/Wallet/WalletForm";
 import { notification } from "../shared/services/notification";
 import { useAuth } from "../shared/hooks/useAuth";
 
