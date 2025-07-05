@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import BrokersPage from "./pages/BrokersPage";
 import WalletsPage from "./pages/WalletsPage";
 import AssetsPage from "./pages/AssetsPage";
+import OperationsPage from "./pages/OperationsPage";
 // ... outros imports de página
 
 export const publicRoutes = [
@@ -16,4 +17,5 @@ export const privateRoutes = [
   { path: "/brokers", element: <BrokersPage /> },
   { path: "/wallets", element: <WalletsPage /> },
   { path: "/assets", element: <AssetsPage /> },
+  { path: "/operations", element: <OperationsPage /> },
 ];
