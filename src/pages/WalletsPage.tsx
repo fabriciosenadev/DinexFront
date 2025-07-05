@@ -3,6 +3,7 @@ import { getWallets, deleteWallet, type WalletDTO } from "../features/Wallet/wal
 import WalletForm from "../features/Wallet/WalletForm";
 import { notification } from "../shared/services/notification";
 import { useAuth } from "../shared/hooks/useAuth";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function WalletsPage() {
     const [wallets, setWallets] = useState<WalletDTO[]>([]);
@@ -102,13 +103,13 @@ export default function WalletsPage() {
                                                 onClick={() => handleEdit(w)}
                                                 className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white font-medium"
                                             >
-                                                Editar
+                                                <Pencil className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(w.id)}
                                                 className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white font-medium"
                                             >
-                                                Excluir
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </td>
                                     </tr>

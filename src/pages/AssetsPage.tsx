@@ -3,6 +3,7 @@ import { getAssets, deleteAsset } from "../features/Asset/asset.service";
 import AssetForm from "../features/Asset/AssetForm";
 import { notification } from "../shared/services/notification";
 import type { AssetDTO } from "../features/Asset/asset.model";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function AssetsPage() {
   const [assets, setAssets] = useState<AssetDTO[]>([]);
@@ -102,13 +103,13 @@ export default function AssetsPage() {
                         onClick={() => handleEdit(a)}
                         className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white font-medium"
                       >
-                        Editar
+                        <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(a.id)}
                         className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white font-medium"
                       >
-                        Excluir
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
                   </tr>
