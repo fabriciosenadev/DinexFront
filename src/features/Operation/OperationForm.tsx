@@ -136,8 +136,8 @@ export default function OperationForm({
     // Função para buscar assets conforme digitação (ou pode ser local)
     const loadAssetOptions = async (inputValue: string) => {
         // Aqui você pode chamar seu endpoint de busca filtrada se preferir (ex: /v1/Assets/search?q=...)
-        const allAssets = await getAssets(); // Ou mantenha um cache/local
-        const assetsByCurrency = allAssets.filter(
+        const assetsPaged = await getAssets(); // Ou mantenha um cache/local
+        const assetsByCurrency = assetsPaged.items.filter(
             a => a.currency === selectedCurrency
         );
         return assetsByCurrency
