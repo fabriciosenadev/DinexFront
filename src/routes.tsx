@@ -6,6 +6,8 @@ import BrokersPage from "./pages/BrokersPage";
 import WalletsPage from "./pages/WalletsPage";
 import AssetsPage from "./pages/AssetsPage";
 import OperationsPage from "./pages/OperationsPage";
+import ReportsPage from "./pages/ReportsPage";
+import SettingsPage from "./pages/SettingsPage";
 // ... outros imports de página
 
 export const publicRoutes = [
@@ -13,9 +15,12 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
-  { path: "/home", element: <Home /> },
+  { path: "/dashboard", element: <Home /> },
   { path: "/brokers", element: <BrokersPage /> },
   { path: "/wallets", element: <WalletsPage /> },
   { path: "/assets", element: <AssetsPage /> },
   { path: "/operations", element: <OperationsPage /> },
+  { path: "/reports", element: <ReportsPage /> },
+  { path: "/settings", element: <SettingsPage /> },
 ];
+
