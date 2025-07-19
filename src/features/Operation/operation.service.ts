@@ -1,5 +1,6 @@
 // src/features/operation/operation.service.ts
 import { api } from "../../shared/services/api";
+import type { PagedResult } from "../../shared/types/api";
 import type {
     OperationDTO,
     CreateOperationCommand,
@@ -12,8 +13,14 @@ export function getOperation(id: string) {
 }
 
 // GET /v1/Operations/wallet/{walletId}
-export function getOperationsByWallet(walletId: string) {
-    return api.get<OperationDTO[]>(`Operations/wallet/${walletId}`);
+export function getOperationsByWallet(
+  walletId: string,
+  params?: Record<string, string | number | undefined>
+) {
+  return api.get<PagedResult<OperationDTO>>(
+    `Operations/wallet/${walletId}`,
+    { params }
+  );
 }
 
 // POST /v1/Operations
