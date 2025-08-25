@@ -10,7 +10,8 @@ import { operationTypeToLabel } from "../features/Operation/operation.helpers";
 import { getWallets, type WalletDTO } from "../features/Wallet/wallet.service";
 import { getAssets } from "../features/Asset/asset.service";
 import { getBrokers } from "../features/Broker/brokers.service";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function OperationsPage() {
     const [wallets, setWallets] = useState<WalletDTO[]>([]);
@@ -93,18 +94,29 @@ export default function OperationsPage() {
         setEditOperation(null);
     };
 
+    const navigate = useNavigate();
+
     // O resto do JSX permanece igual, só adiciona o bloco de paginação
     return (
         <div className="flex flex-col items-center justify-start min-h-[calc(100vh-64px)] pt-16 px-2">
             <div className="w-full max-w-md sm:max-w-4xl bg-slate-900 shadow-lg rounded-2xl p-4 sm:p-8">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-3xl font-bold text-white">Operações</h2>
-                    <button
-                        onClick={handleCreate}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
-                    >
-                        Nova operação
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => navigate("/import")}
+                            className="bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500 flex items-center px-3 py-2 rounded font-semibold transition"
+                        >
+                            <Upload className="w-4 h-4 mr-2" />
+                            Importar Extrato B3
+                        </button>
+                        <button
+                            onClick={handleCreate}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
+                        >
+                            Nova operação
+                        </button>
+                    </div>
                 </div>
                 {showForm && (
                     <OperationForm

@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import { LineChart, ListOrdered, Home, Wallet, BarChart, Settings } from "lucide-react";
+import { LineChart, ListOrdered, Home, Wallet, BarChart, Settings, Upload } from "lucide-react";
 
 export interface MenuItem {
   label: string;
@@ -22,6 +22,11 @@ export const MENU: MenuItem[] = [
     label: "Operações",
     to: "/operations",
     icon: <ListOrdered className="w-5 h-5 mr-2" />,
+  },
+  {
+    label: "Importação",
+    to: "/import",
+    icon: <Upload className="w-5 h-5 mr-2" />,   // AQUI: Importação entre operações e carteiras
   },
   {
     label: "Carteiras",

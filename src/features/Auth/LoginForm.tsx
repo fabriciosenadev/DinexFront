@@ -25,7 +25,7 @@ export default function LoginForm() {
       const data = await loginApi(email, password);
       login(data);         // Atualiza contexto + localStorage
       notification.success("Login realizado com sucesso!");
-      navigate("/home");         // Redireciona para rota protegida
+      navigate("/dashboard");         // Redireciona para rota protegida
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
