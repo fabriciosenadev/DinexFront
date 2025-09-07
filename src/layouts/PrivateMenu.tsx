@@ -1,5 +1,12 @@
 import type { JSX } from "react";
-import { LineChart, ListOrdered, Home, Wallet, BarChart, Settings, Upload } from "lucide-react";
+import { 
+  LineChart, 
+  ListOrdered, 
+  Home, 
+  Wallet, 
+  BarChart, 
+  Settings, 
+  Upload } from "lucide-react";
 
 export interface MenuItem {
   label: string;
