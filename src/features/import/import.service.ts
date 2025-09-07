@@ -1,30 +1,25 @@
-// import { api } from "../../shared/services/api";
+// src/features/import/import.service.ts
+import { api } from "../../shared/services/api";
+import type { ImportJobDTO } from "./import.model";
 
-export async function uploadB3Statement(file: File): Promise<{ data: string }> {
-    // Se usar auth, pegue o token conforme seu padrão
-    const userData = localStorage.getItem("dinex:user-data"); // ou getUserToken()
-    const token = userData ? JSON.parse(userData).token : null;
-    const userId = userData ? JSON.parse(userData).id : null;
+export async function uploadB3Statement(file: File): Promise<string> {
+  const userDataRaw = localStorage.getItem("dinex:user-data");
+  const userData = userDataRaw ? (JSON.parse(userDataRaw) as { id?: string }) : null;
+  const userId = userData?.id;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    if (userId) formData.append("userId", userId);
+  const form = new FormData();
+  form.append("file", file);
+  if (userId) form.append("userId", userId);
 
-    const response = await fetch("https://localhost:5001/v1/import/b3/upload", {
-        method: "POST",
-        body: formData,
-        headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            // Não envie Content-Type! O browser resolve
-        },
-    });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error?.Errors?.[0] || response.statusText || "Erro ao importar extrato");
-    }
-
-    // Backend retorna { data: importJobId }
-    return response.json();
+  // api.post fará o unwrap de { data: "<guid>" } → string
+  return api.post<string, FormData>("import/b3/upload", form);
 }
 
+export async function getImportJobs(params?: {
+  status?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<ImportJobDTO[]> {
+  // api.get fará o unwrap de { data: [...] } → ImportJobDTO[]
+  return api.get<ImportJobDTO[]>("import/jobs", { params });
+}
