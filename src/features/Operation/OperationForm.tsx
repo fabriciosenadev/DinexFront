@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AsyncSelect from "react-select/async";
 import type { StylesConfig } from "react-select";
 import { NumericFormat } from "react-number-format";
@@ -57,6 +58,9 @@ export default function OperationForm({
     const selectedCurrency = selectedWallet?.defaultCurrency ?? "BRL";
     const maskConfig = getCurrencyMaskConfig(selectedCurrency);
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (operation) {
             setWalletId(operation.walletId);
@@ -75,7 +79,11 @@ export default function OperationForm({
             setUnitPrice(0);
             setExecutedAt("");
         }
-    }, [operation]);
+
+        const params = new URLSearchParams(location.search);
+        const selected = params.get("selectedBrokerId");
+        if (selected) setBrokerId(selected);
+    }, [operation, location.search]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,6 +139,11 @@ export default function OperationForm({
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleManageBrokers = () => {
+        const ret = encodeURIComponent(location.pathname + location.search);
+        navigate(`/settings/brokers?return=${ret}`);
     };
 
     // Função para buscar assets conforme digitação (ou pode ser local)
@@ -247,9 +260,21 @@ export default function OperationForm({
                 />
             </div>
             <div>
-                <label className="block text-white font-semibold mb-1">
-                    Corretora
-                </label>
+                <div className="flex items-center justify-between">
+                    <label className="block text-white font-semibold mb-1">Corretora</label>
+
+                    {/* botão texto: ir para /settings/brokers com retorno */}
+                    <button
+                        type="button"
+                        onClick={handleManageBrokers}
+                        className="text-sm text-indigo-400 hover:text-indigo-300 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded px-1"
+                        disabled={submitting}
+                        title="Gerenciar corretoras"
+                    >
+                        Gerenciar corretoras
+                    </button>
+                </div>
+
                 <select
                     className="w-full px-3 py-2 rounded bg-slate-800 text-white"
                     value={brokerId ?? ""}
