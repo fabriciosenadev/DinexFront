@@ -4,7 +4,7 @@ import PageHeader from "../shared/components/layout/PageHeader";
 
 export default function Home() {
   return (
-    <PageLayout variant="default">
+    <PageLayout variant="wide">
       <PageHeader title="Dashboard" subtitle="Visão geral das suas carteiras e operações" />
 
       {/* Grid responsiva de cards (placeholders por enquanto) */}
