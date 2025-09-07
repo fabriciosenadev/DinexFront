@@ -1,9 +1,13 @@
+// src/pages/ImportPage.tsx
+import PageLayout from "../shared/components/layout/PageLayout";
+import PageHeader from "../shared/components/layout/PageHeader";
 import ImportForm from "../features/import/ImportForm";
 
 export default function ImportPage() {
   return (
-    <div className="w-full flex flex-col items-center pt-12 px-2">
+    <PageLayout variant="narrow">
+      <PageHeader title="Importação" subtitle="Envie o .xlsx do extrato de negociações da B3" />
       <ImportForm />
-    </div>
+    </PageLayout>
   );
 }

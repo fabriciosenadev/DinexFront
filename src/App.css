@@ -1,9 +1,16 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+} */
+ html, body, #root { 
+  height: 100%;
+  overflow-x: hidden;       /* impede a página inteira de rolar na horizontal */
 }
+
+body { background-color: #0f172a; } /* mesma cor do bg-slate-950 pra não “aparecer branco” */
+
 
 .logo {
   height: 6em;

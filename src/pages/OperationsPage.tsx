@@ -1,8 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import {
-    getOperationsByWallet,
-    deleteOperation,
-} from "../features/Operation/operation.service";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { getOperationsByWallet, deleteOperation } from "../features/Operation/operation.service";
 import OperationForm from "../features/Operation/OperationForm";
 import { notification } from "../shared/services/notification";
 import type { OperationDTO } from "../features/Operation/operation.model";
@@ -12,6 +9,9 @@ import { getAssets } from "../features/Asset/asset.service";
 import { getBrokers } from "../features/Broker/brokers.service";
 import { Pencil, Trash2, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PageLayout from "../shared/components/layout/PageLayout";
+import PageHeader from "../shared/components/layout/PageHeader";
+import TableWrapper from "../shared/components/layout/TableWrapper";
 
 export default function OperationsPage() {
     const [wallets, setWallets] = useState<WalletDTO[]>([]);
@@ -22,40 +22,40 @@ export default function OperationsPage() {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editOperation, setEditOperation] = useState<OperationDTO | null>(null);
-
-    // Adicione estados para paginação:
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
 
-    // Buscar entidades reais ao montar
+    const navigate = useNavigate();
+
+    // maps para busca O(1) nos renders (evita find repetido)
+    const walletMap = useMemo(() => Object.fromEntries(wallets.map(w => [w.id, w.name])), [wallets]);
+    const assetMap = useMemo(() => Object.fromEntries(assets.map(a => [a.value, a.label])), [assets]);
+    const brokerMap = useMemo(() => Object.fromEntries(brokers.map(b => [b.value, b.label])), [brokers]);
+
     useEffect(() => {
-        getWallets().then(walletList => {
+        getWallets().then((walletList) => {
             setWallets(walletList);
             if (walletList.length > 0) setWalletId(walletList[0].id);
         });
 
-        getAssets().then(assetPaged => {
-            setAssets(assetPaged.items.map(a => ({
+        getAssets().then((assetPaged) => {
+            setAssets(assetPaged.items.map((a) => ({
                 value: a.id,
                 label: `${a.name} (${a.code})`,
             })));
         });
 
-        getBrokers().then(brokerList => {
-            setBrokers(brokerList.map(b => ({
-                value: b.id,
-                label: b.name,
-            })));
+        getBrokers().then((brokerList) => {
+            setBrokers(brokerList.map((b) => ({ value: b.id, label: b.name })));
         });
     }, []);
 
-    // Buscar operações da carteira selecionada e paginada
     const fetchOperations = useCallback(() => {
         if (!walletId) return;
         setLoading(true);
         getOperationsByWallet(walletId, { page, pageSize })
-            .then(result => {
+            .then((result) => {
                 setOperations(result.items);
                 setTotal(result.totalCount);
             })
@@ -94,14 +94,14 @@ export default function OperationsPage() {
         setEditOperation(null);
     };
 
-    const navigate = useNavigate();
+    const formatMoney = (n: number) =>
+        n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    // O resto do JSX permanece igual, só adiciona o bloco de paginação
     return (
-        <div className="flex flex-col items-center justify-start min-h-[calc(100vh-64px)] pt-16 px-2">
-            <div className="w-full max-w-md sm:max-w-4xl bg-slate-900 shadow-lg rounded-2xl p-4 sm:p-8">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-3xl font-bold text-white">Operações</h2>
+        <PageLayout variant="wide">
+            <PageHeader
+                title="Operações"
+                actions={
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate("/import")}
@@ -117,7 +117,10 @@ export default function OperationsPage() {
                             Nova operação
                         </button>
                     </div>
-                </div>
+                }
+            />
+
+            <div className="w-full bg-slate-900 shadow-lg rounded-2xl p-4 sm:p-6">
                 {showForm && (
                     <OperationForm
                         operation={editOperation}
@@ -128,99 +131,170 @@ export default function OperationsPage() {
                         brokers={brokers}
                     />
                 )}
-                {/* Select de carteira */}
+
+                {/* Filtro de carteira */}
                 <div className="mb-6">
                     <label className="block text-white font-semibold mb-1">Carteira</label>
                     <select
                         className="w-full px-3 py-2 rounded bg-slate-800 text-white"
                         value={walletId}
-                        onChange={e => {
+                        onChange={(e) => {
                             setWalletId(e.target.value);
-                            setPage(1); // volta pra página 1 se trocar carteira!
+                            setPage(1);
                         }}
                         disabled={loading}
                     >
-                        {wallets.map(wallet => (
+                        {wallets.map((wallet) => (
                             <option key={wallet.id} value={wallet.id}>
                                 {wallet.name}
                             </option>
                         ))}
                     </select>
                 </div>
+
                 {loading ? (
                     <div className="text-center mt-8 text-white/80">Carregando...</div>
+                ) : operations.length === 0 ? (
+                    <div className="text-center text-white/60 py-6 bg-slate-800 rounded-xl">
+                        Nenhuma operação cadastrada.
+                    </div>
                 ) : (
                     <>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm bg-slate-800 text-white rounded shadow">
-                                <thead>
-                                    <tr>
-                                        <th className="p-3 text-left whitespace-nowrap">Carteira</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Ativo</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Tipo</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Quantidade</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Preço Unitário</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Valor Total</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Corretora</th>
-                                        <th className="p-3 text-left whitespace-nowrap">Data</th>
-                                        <th className="p-3">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {operations.map((op) => (
-                                        <tr key={op.id} className="border-t border-slate-700 hover:bg-slate-700/50">
-                                            <td className="p-3 whitespace-nowrap">{wallets.find(w => w.id === op.walletId)?.name || "-"}</td>
-                                            <td className="p-3 whitespace-nowrap">{assets.find(a => a.value === op.assetId)?.label || "-"}</td>
-                                            <td className="p-3 whitespace-nowrap">{operationTypeToLabel(op.type)}</td>
-                                            <td className="p-3 whitespace-nowrap">{op.quantity}</td>
-                                            <td className="p-3 whitespace-nowrap">{op.unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                                            <td className="p-3 whitespace-nowrap">{op.totalValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                                            <td className="p-3 whitespace-nowrap">{brokers.find(b => b.value === op.brokerId)?.label || "-"}</td>
-                                            <td className="p-3 whitespace-nowrap">{new Date(op.executedAt).toLocaleDateString()}</td>
-                                            <td className="p-3 flex gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(op)}
-                                                    className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white font-medium"
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(op.id)}
-                                                    className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white font-medium"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {operations.length === 0 && (
+                        {/* MOBILE: cards */}
+                        <ul className="sm:hidden space-y-3">
+                            {operations.map((op) => (
+                                <li
+                                    key={op.id}
+                                    className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="text-white font-semibold">
+                                            {assetMap[op.assetId] ?? "-"}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleEdit(op)}
+                                                className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white"
+                                                aria-label="Editar operação"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(op.id)}
+                                                className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white"
+                                                aria-label="Excluir operação"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-3 grid grid-cols-1 gap-2 text-sm">
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Carteira</div>
+                                            <div className="text-white">{walletMap[op.walletId] ?? "-"}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Tipo</div>
+                                            <div className="text-white">{operationTypeToLabel(op.type)}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Quantidade</div>
+                                            <div className="text-white">{op.quantity}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Preço unitário</div>
+                                            <div className="text-white">{formatMoney(op.unitPrice)}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Valor total</div>
+                                            <div className="text-white">{formatMoney(op.totalValue)}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Corretora</div>
+                                            <div className="text-white">{brokerMap[op.brokerId ?? ""] ?? "-"}</div>
+                                        </div>
+                                        <div className="rounded-lg bg-slate-900 px-3 py-2">
+                                            <div className="text-white/50 text-xs">Data</div>
+                                            <div className="text-white">{new Date(op.executedAt).toLocaleDateString()}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+
+                        {/* DESKTOP: tabela com rolagem só do wrapper */}
+                        <div className="hidden sm:block">
+                            <TableWrapper>
+                                <table className="min-w-[980px] w-full text-sm text-white">
+                                    <thead>
                                         <tr>
-                                            <td colSpan={9} className="text-center text-white/60 py-6">
-                                                Nenhuma operação cadastrada.
-                                            </td>
+                                            <th className="p-3 text-left whitespace-nowrap">Carteira</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Ativo</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Tipo</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Quantidade</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Preço Unitário</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Valor Total</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Corretora</th>
+                                            <th className="p-3 text-left whitespace-nowrap">Data</th>
+                                            <th className="p-3 text-center">Ações</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {operations.map((op) => (
+                                            <tr key={op.id} className="border-t border-slate-700 hover:bg-slate-700/40">
+                                                <td className="p-3 whitespace-nowrap">{walletMap[op.walletId] ?? "-"}</td>
+                                                <td className="p-3 whitespace-nowrap">{assetMap[op.assetId] ?? "-"}</td>
+                                                <td className="p-3 whitespace-nowrap">{operationTypeToLabel(op.type)}</td>
+                                                <td className="p-3 whitespace-nowrap">{op.quantity}</td>
+                                                <td className="p-3 whitespace-nowrap">{formatMoney(op.unitPrice)}</td>
+                                                <td className="p-3 whitespace-nowrap">{formatMoney(op.totalValue)}</td>
+                                                <td className="p-3 whitespace-nowrap">{brokerMap[op.brokerId ?? ""] ?? "-"}</td>
+                                                <td className="p-3 whitespace-nowrap">{new Date(op.executedAt).toLocaleDateString()}</td>
+                                                <td className="p-3">
+                                                    <div className="flex justify-center gap-2">
+                                                        <button
+                                                            onClick={() => handleEdit(op)}
+                                                            className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white font-medium"
+                                                            aria-label="Editar operação"
+                                                        >
+                                                            <Pencil className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(op.id)}
+                                                            className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white font-medium"
+                                                            aria-label="Excluir operação"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </TableWrapper>
                         </div>
-                        {/* Paginação */}
+
+                        {/* paginação */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4">
                             <div className="flex justify-center sm:justify-start">
                                 <select
                                     value={pageSize}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setPageSize(Number(e.target.value));
                                         setPage(1);
                                     }}
                                     className="bg-slate-700 text-white px-2 py-1 rounded"
                                 >
-                                    {[10, 20, 50].map(size => (
+                                    {[10, 20, 50].map((size) => (
                                         <option key={size} value={size}>
                                             {size} por página
                                         </option>
                                     ))}
                                 </select>
                             </div>
+
                             <div className="flex justify-center sm:justify-end items-center gap-2 flex-wrap">
                                 <button
                                     className="px-3 py-1 bg-slate-700 rounded text-white disabled:opacity-50"
@@ -245,6 +319,6 @@ export default function OperationsPage() {
                     </>
                 )}
             </div>
-        </div>
+        </PageLayout>
     );
 }

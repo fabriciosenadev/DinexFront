@@ -1,18 +1,48 @@
 // src/pages/Home.tsx
+import PageLayout from "../shared/components/layout/PageLayout";
+import PageHeader from "../shared/components/layout/PageHeader";
 
 export default function Home() {
   return (
-    <div className="bg-white/10 backdrop-blur-lg p-10 rounded-2xl shadow-xl flex flex-col items-center gap-4">
-      <h1 className="text-4xl md:text-5xl font-bold text-white">Bem-vindo ao Dinex!</h1>
-      <p className="text-white/80 text-lg text-center max-w-md">
-        Sua plataforma para gestão financeira e investimentos, agora em React + Vite + Tailwind.
-      </p>
-      <a
-        href="/login"
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition"
-      >
-        Acessar minha conta
-      </a>
-    </div>
+    <PageLayout variant="default">
+      <PageHeader title="Dashboard" subtitle="Visão geral das suas carteiras e operações" />
+
+      {/* Grid responsiva de cards (placeholders por enquanto) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+        {/* KPIs principais */}
+        <div className="lg:col-span-3 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-400 text-sm">Patrimônio</p>
+          <div className="h-8 mt-2 bg-slate-800/70 rounded" />
+        </div>
+        <div className="lg:col-span-3 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-400 text-sm">P/L do dia</p>
+          <div className="h-8 mt-2 bg-slate-800/70 rounded" />
+        </div>
+        <div className="lg:col-span-3 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-400 text-sm">Aportes (30d)</p>
+          <div className="h-8 mt-2 bg-slate-800/70 rounded" />
+        </div>
+        <div className="lg:col-span-3 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-400 text-sm">Dividendos (30d)</p>
+          <div className="h-8 mt-2 bg-slate-800/70 rounded" />
+        </div>
+
+        {/* Alocação / Performance */}
+        <div className="lg:col-span-6 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-200 font-semibold">Alocação por classe</p>
+          <div className="h-40 mt-3 bg-slate-800/70 rounded" />
+        </div>
+        <div className="lg:col-span-6 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-200 font-semibold">Performance (YTD)</p>
+          <div className="h-40 mt-3 bg-slate-800/70 rounded" />
+        </div>
+
+        {/* Últimas operações */}
+        <div className="lg:col-span-12 bg-slate-900 rounded-2xl p-4">
+          <p className="text-slate-200 font-semibold">Últimas operações</p>
+          <div className="h-28 mt-3 bg-slate-800/70 rounded" />
+        </div>
+      </div>
+    </PageLayout>
   );
 }

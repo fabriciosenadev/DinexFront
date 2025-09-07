@@ -10,3 +10,5 @@
   right: 1rem !important;
   left: auto !important;
 } */
+
+html, body, #root { height: 100%; overflow-x: hidden; }
