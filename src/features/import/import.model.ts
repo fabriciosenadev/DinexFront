@@ -4,10 +4,25 @@ export type ImportJobStatus = "Pendente" | "Processando" | "Concluido" | "Falha"
 export interface ImportJobDTO {
   id: string;
   fileName: string;
-  uploadedAt: string;        // ISO vindo do backend
-  status: ImportJobStatus;   // backend devolve em PT-BR
-  totalRows?: number;
-  importedRows?: number;
-  errorsCount?: number;
+  uploadedAt: string;
+  status: ImportJobStatus;
+  totalRows: number;
+  importedRows: number;
+  errorsCount: number;
 }
 
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ImportErrorDTO {
+  id: string;
+  importJobId: string;
+  lineNumber: number;
+  error: string;
+  rawLineJson?: string | null;
+  createdAt: string;
+}
