@@ -19,17 +19,30 @@ export type ImportErrorDTO = {
   createdAt: string;
 };
 
-export async function uploadB3Statement(file: File): Promise<string> {
-  const userDataRaw = localStorage.getItem("dinex:user-data");
-  const userData = userDataRaw ? (JSON.parse(userDataRaw) as { id?: string }) : null;
-  const userId = userData?.id;
+// src/features/import/import.service.ts
+export type UploadResponse = { data: string }; // ou { id: string }
 
+export async function uploadB3Statement(file: File): Promise<UploadResponse> {
   const form = new FormData();
   form.append("file", file);
-  if (userId) form.append("userId", userId);
 
-  return api.post<string, FormData>("import/b3/upload", form);
+  const res = await fetch("/v1/ImportJobs/b3", {
+    method: "POST",
+    body: form,
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Falha no upload (${res.status}) ${body}`);
+  }
+
+  // **Escolha um formato e mantenha. Exemplo usando { data: string }**
+  const json = await res.json() as { data?: string; id?: string; };
+  const data = json.data ?? json.id;
+  if (!data) throw new Error("Resposta do servidor sem 'data' ou 'id'.");
+  return { data };
 }
+
 
 export async function getImportJobs(params?: {
   status?: string;
