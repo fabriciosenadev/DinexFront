@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getImportJobs, getImportErrors } from "./import.service";
 import type { ImportJobDTO, ImportJobStatus } from "./import.model";
 import type { ImportErrorDTO, PagedResult } from "./import.service";
-import { ListChecks, PlayCircle, Bug } from "lucide-react";
+import { ListChecks, PlayCircle, AlertTriangle } from "lucide-react";
 
 type ErrorsState = {
   page: number;
@@ -157,11 +157,11 @@ export default function ImportList() {
                         <button
                           type="button"
                           onClick={() => void openErrors(row)}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-red-600/80 hover:bg-red-600 text-white"
-                          title="Ver erros desta importação"
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-600/80 hover:bg-yellow-600 text-white"
+                          title="Revisar inconsistências desta importação"
                         >
-                          <Bug className="w-4 h-4" />
-                          Ver erros
+                          <AlertTriangle className="w-4 h-4" />
+                          Revisar inconsistências
                         </button>
                       </div>
                     </td>
@@ -214,22 +214,58 @@ function ErrorsModal(props: {
   const { open, onClose, job, loading, loadError, data } = props;
   if (!open) return null;
 
+  async function handleCopy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      // notification.success("Mensagem copiada para a área de transferência.");
+    } catch {
+      alert("Não foi possível copiar para a área de transferência.");
+    }
+  }
+
+  async function handleViewRaw(errorId: string) {
+    console.log("Ver conteúdo bruto do erro", errorId);
+    // TODO: buscar conteúdo bruto on-demand e abrir num modal/side panel
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog" aria-labelledby="errors-title" onKeyDown={(e) => e.key === "Escape" && onClose()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="errors-title"
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
+    >
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-4xl bg-slate-900 rounded-2xl shadow-lg p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 id="errors-title" className="text-lg font-bold text-white">
-            Erros da importação {job ? job.fileName : ""}
-          </h3>
-          <button type="button" onClick={onClose} className="text-slate-300 hover:text-white px-2 py-1 rounded" aria-label="Fechar">✕</button>
+        <div className="mb-4">
+          <div className="flex items-start justify-between">
+            <h3 id="errors-title" className="text-lg font-bold text-white">
+              Inconsistências de Validação na Importação {job ? job.fileName : ""}
+            </h3>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-slate-300 hover:text-white px-2 py-1 rounded"
+              aria-label="Fechar"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* subtítulo explicativo */}
+          <p className="mt-1 text-slate-400 text-sm">
+            Essas inconsistências foram identificadas pela validação automática e{" "}
+            <span className="text-slate-300">podem não representar erros definitivos</span>.
+            Revise antes de corrigir ou reprocessar.
+          </p>
         </div>
 
-        {loading && <div className="text-slate-400">Carregando erros…</div>}
+        {loading && <div className="text-slate-400">Carregando inconsistências…</div>}
         {loadError && <div className="text-red-400">{loadError}</div>}
 
         {!loading && !loadError && data && data.items.length === 0 && (
-          <div className="text-slate-400">Nenhum erro encontrado.</div>
+          <div className="text-slate-400">Nenhuma inconsistência encontrada.</div>
         )}
 
         {!loading && !loadError && data && data.items.length > 0 && (
@@ -240,8 +276,8 @@ function ErrorsModal(props: {
                   <tr className="text-left text-slate-300 bg-slate-800/50">
                     <th className="py-2 px-3 w-20">Linha</th>
                     <th className="py-2 px-3">Mensagem</th>
-                    <th className="py-2 px-3 w-[45%]">Conteúdo bruto</th>
                     <th className="py-2 px-3 w-44">Criado em</th>
+                    <th className="py-2 px-3 w-48">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -249,12 +285,27 @@ function ErrorsModal(props: {
                     <tr key={er.id} className="border-t border-slate-800 text-slate-200 align-top">
                       <td className="py-2 px-3 font-mono">{er.lineNumber}</td>
                       <td className="py-2 px-3">{er.error}</td>
-                      <td className="py-2 px-3">
-                        <pre className="whitespace-pre-wrap break-words text-xs text-slate-300">
-                          {er.rawLineJson ?? "—"}
-                        </pre>
-                      </td>
                       <td className="py-2 px-3">{formatIsoToLocal(er.createdAt)}</td>
+                      <td className="py-2 px-3">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void handleCopy(er.error)}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-white"
+                            title="Copiar mensagem"
+                          >
+                            Copiar mensagem
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleViewRaw(er.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-white"
+                            title="Ver conteúdo bruto (quando disponível)"
+                          >
+                            Ver conteúdo
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -262,13 +313,18 @@ function ErrorsModal(props: {
             </div>
 
             <div className="mt-3 text-slate-400 text-sm">
-              Total de erros: <span className="text-white font-semibold">{data.totalCount}</span>
+              Total de inconsistências:{" "}
+              <span className="text-white font-semibold">{data.totalCount}</span>
             </div>
           </>
         )}
 
         <div className="mt-4 text-right">
-          <button type="button" onClick={onClose} className="inline-flex items-center px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white"
+          >
             Fechar
           </button>
         </div>
