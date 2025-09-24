@@ -1,17 +1,20 @@
+// src/pages/ImportPage.tsx
 import PageLayout from "../shared/components/layout/PageLayout";
 import PageSection from "../shared/components/layout/PageSection";
+import PageHeader from "../shared/components/layout/PageHeader";
 import ImportForm from "../features/import/ImportForm";
 import ImportList from "../features/import/ImportList";
-import PageHeader from "../shared/components/layout/PageHeader";
 
 export default function ImportPage() {
   return (
-    <PageLayout variant="wide">
-      <PageHeader
-        title="Importação"
-        subtitle="Envie o .xlsx do extrato de negociações da B3."
-        // actions={<div>/* se quiser botões no header depois */</div>}
-      />
+    <PageLayout>
+      <PageSection>
+        <PageHeader
+          title="Importação"
+          subtitle="Envie o .xlsx do extrato de negociações da B3."
+          /* 🔹 sem className aqui */
+        />
+      </PageSection>
 
       <PageSection variant="narrow">
         <ImportForm />
@@ -23,3 +26,4 @@ export default function ImportPage() {
     </PageLayout>
   );
 }
+

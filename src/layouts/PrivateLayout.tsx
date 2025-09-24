@@ -110,7 +110,7 @@ export default function PrivateLayout() {
       )}
 
       {/* Área de conteúdo */}
-      <div className="flex-1 min-h-screen flex flex-col">
+      <div className="flex-1 min-h-screen flex flex-col min-w-0">
         {/* Topbar mobile */}
         <header className="sm:hidden fixed w-full top-0 left-0 bg-slate-900 flex items-center justify-between px-4 h-16 z-40">
           <button
@@ -127,7 +127,7 @@ export default function PrivateLayout() {
         </header>
 
         {/* Compensação do topbar mobile; sem gutters aqui */}
-        <main className="flex-1 pt-16 w-full overflow-x-hidden">
+        <main className="flex-1 pt-16 w-full min-w-0">
           <Outlet />
         </main>
       </div>
