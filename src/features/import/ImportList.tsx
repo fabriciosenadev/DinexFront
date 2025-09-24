@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { getImportJobs, getImportErrors } from "./import.service";
 import type { ImportJobDTO, ImportJobStatus } from "./import.model";
 import type { ImportErrorDTO, PagedResult } from "./import.service";
-import { ListChecks, PlayCircle, AlertTriangle } from "lucide-react";
+import { ListChecks, PlayCircle, AlertTriangle, FileText, Calendar } from "lucide-react";
+import TableWrapper from "../../shared/components/layout/TableWrapper";
 
 type ErrorsState = {
   page: number;
@@ -107,70 +108,149 @@ export default function ImportList() {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-300">
-                <th className="py-2 px-3">ID</th>
-                <th className="py-2 px-3">Arquivo</th>
-                <th className="py-2 px-3">Enviado em</th>
-                <th className="py-2 px-3">Status</th>
-                <th className="py-2 px-3">Importadas</th>
-                <th className="py-2 px-3">Erros</th>
-                <th className="py-2 px-3">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((row) => {
-                const total = row.totalRows ?? 0;
-                const imported = row.importedRows ?? 0;
-                const errorsCount = row.errorsCount ?? 0;
-                const remainingValid = Math.max(0, total - imported - errorsCount);
-                const canProcess =
-                  remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
+        <>
+          {/* MOBILE: cards */}
+          <ul className="sm:hidden space-y-3">
+            {items.map((row) => {
+              const total = row.totalRows ?? 0;
+              const imported = row.importedRows ?? 0;
+              const errorsCount = row.errorsCount ?? 0;
+              const remainingValid = Math.max(0, total - imported - errorsCount);
+              const canProcess =
+                remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
 
-                return (
-                  <tr key={row.id} className="border-t border-slate-800 text-slate-200">
-                    <td className="py-2 px-3 font-mono opacity-80">{row.id.slice(0, 8)}…</td>
-                    <td className="py-2 px-3">
-                      <span title={row.fileName} className="truncate inline-block max-w-[280px] align-bottom">
-                        {row.fileName}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3">{formatIsoToLocal(row.uploadedAt)}</td>
-                    <td className="py-2 px-3"><StatusPill value={row.status} /></td>
-                    <td className="py-2 px-3">{imported}/{total}</td>
-                    <td className="py-2 px-3">{errorsCount}</td>
-                    <td className="py-2 px-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={!canProcess}
-                          onClick={() => void handleProcessValid(row.id)}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-green-600/80 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={canProcess ? "Processar todas as linhas válidas" : "Nada para processar"}
-                        >
-                          <PlayCircle className="w-4 h-4" />
-                          {processingId === row.id ? "Processando…" : "Processar válidas"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => void openErrors(row)}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-600/80 hover:bg-yellow-600 text-white"
-                          title="Revisar inconsistências desta importação"
-                        >
-                          <AlertTriangle className="w-4 h-4" />
-                          Revisar inconsistências
-                        </button>
+              return (
+                <li
+                  key={row.id}
+                  className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="text-white font-semibold flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-slate-300" />
+                        <span title={row.fileName} className="truncate max-w-[220px]">
+                          {row.fileName}
+                        </span>
                       </div>
-                    </td>
+                      <div className="text-xs text-slate-400 flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{formatIsoToLocal(row.uploadedAt)}</span>
+                      </div>
+                    </div>
+
+                    <StatusPill value={row.status} />
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
+                    <div className="rounded-lg bg-slate-900 px-3 py-2">
+                      <div className="text-white/50 text-xs">Importadas</div>
+                      <div className="text-white">{imported}/{total}</div>
+                    </div>
+                    <div className="rounded-lg bg-slate-900 px-3 py-2">
+                      <div className="text-white/50 text-xs">Erros</div>
+                      <div className="text-white">{errorsCount}</div>
+                    </div>
+                    <div className="rounded-lg bg-slate-900 px-3 py-2">
+                      <div className="text-white/50 text-xs">Restantes</div>
+                      <div className="text-white">{remainingValid}</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex flex-col xs:flex-row gap-2">
+                    <button
+                      type="button"
+                      disabled={!canProcess}
+                      onClick={() => void handleProcessValid(row.id)}
+                      className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-green-600/80 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={canProcess ? "Processar todas as linhas válidas" : "Nada para processar"}
+                    >
+                      <PlayCircle className="w-4 h-4" />
+                      {processingId === row.id ? "Processando…" : "Processar válidas"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => void openErrors(row)}
+                      className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-yellow-600/80 hover:bg-yellow-600 text-white"
+                      title="Revisar inconsistências desta importação"
+                    >
+                      <AlertTriangle className="w-4 h-4" />
+                      Revisar inconsistências
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* DESKTOP: tabela dentro do wrapper (rolagem só do wrapper) */}
+          <div className="hidden sm:block">
+            <TableWrapper>
+              <table className="min-w-[980px] w-full text-sm">
+                <thead>
+                  <tr className="text-left text-slate-300">
+                    <th className="py-2 px-3">ID</th>
+                    <th className="py-2 px-3">Arquivo</th>
+                    <th className="py-2 px-3">Enviado em</th>
+                    <th className="py-2 px-3">Status</th>
+                    <th className="py-2 px-3">Importadas</th>
+                    <th className="py-2 px-3">Erros</th>
+                    <th className="py-2 px-3">Ações</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {items.map((row) => {
+                    const total = row.totalRows ?? 0;
+                    const imported = row.importedRows ?? 0;
+                    const errorsCount = row.errorsCount ?? 0;
+                    const remainingValid = Math.max(0, total - imported - errorsCount);
+                    const canProcess =
+                      remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
+
+                    return (
+                      <tr key={row.id} className="border-t border-slate-800 text-slate-200">
+                        <td className="py-2 px-3 font-mono opacity-80">{row.id.slice(0, 8)}…</td>
+                        <td className="py-2 px-3">
+                          <span title={row.fileName} className="truncate inline-block max-w-[280px] align-bottom">
+                            {row.fileName}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3">{formatIsoToLocal(row.uploadedAt)}</td>
+                        <td className="py-2 px-3"><StatusPill value={row.status} /></td>
+                        <td className="py-2 px-3">{imported}/{total}</td>
+                        <td className="py-2 px-3">{errorsCount}</td>
+                        <td className="py-2 px-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              disabled={!canProcess}
+                              onClick={() => void handleProcessValid(row.id)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-green-600/80 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={canProcess ? "Processar todas as linhas válidas" : "Nada para processar"}
+                            >
+                              <PlayCircle className="w-4 h-4" />
+                              {processingId === row.id ? "Processando…" : "Processar válidas"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => void openErrors(row)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-600/80 hover:bg-yellow-600 text-white"
+                              title="Revisar inconsistências desta importação"
+                            >
+                              <AlertTriangle className="w-4 h-4" />
+                              Revisar inconsistências
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </TableWrapper>
+          </div>
+        </>
       )}
 
       <ErrorsModal
@@ -217,7 +297,6 @@ function ErrorsModal(props: {
   async function handleCopy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      // notification.success("Mensagem copiada para a área de transferência.");
     } catch {
       alert("Não foi possível copiar para a área de transferência.");
     }
@@ -225,7 +304,6 @@ function ErrorsModal(props: {
 
   async function handleViewRaw(errorId: string) {
     console.log("Ver conteúdo bruto do erro", errorId);
-    // TODO: buscar conteúdo bruto on-demand e abrir num modal/side panel
   }
 
   return (
@@ -253,7 +331,6 @@ function ErrorsModal(props: {
             </button>
           </div>
 
-          {/* subtítulo explicativo */}
           <p className="mt-1 text-slate-400 text-sm">
             Essas inconsistências foram identificadas pela validação automática e{" "}
             <span className="text-slate-300">podem não representar erros definitivos</span>.
