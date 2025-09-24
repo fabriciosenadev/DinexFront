@@ -283,6 +283,7 @@ function StatusPill({ value }: { value: ImportJobStatus }) {
 }
 
 // ---------- Modal de erros ----------
+// ---------- Modal de erros ----------
 function ErrorsModal(props: {
   open: boolean;
   onClose: () => void;
@@ -347,47 +348,107 @@ function ErrorsModal(props: {
 
         {!loading && !loadError && data && data.items.length > 0 && (
           <>
-            <div className="max-h-[60vh] overflow-auto rounded-lg border border-slate-800">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-left text-slate-300 bg-slate-800/50">
-                    <th className="py-2 px-3 w-20">Linha</th>
-                    <th className="py-2 px-3">Mensagem</th>
-                    <th className="py-2 px-3 w-44">Criado em</th>
-                    <th className="py-2 px-3 w-48">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.items.map((er) => (
-                    <tr key={er.id} className="border-t border-slate-800 text-slate-200 align-top">
-                      <td className="py-2 px-3 font-mono">{er.lineNumber}</td>
-                      <td className="py-2 px-3">{er.error}</td>
-                      <td className="py-2 px-3">{formatIsoToLocal(er.createdAt)}</td>
-                      <td className="py-2 px-3">
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => void handleCopy(er.error)}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-white"
-                            title="Copiar mensagem"
-                          >
-                            Copiar mensagem
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleViewRaw(er.id)}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-white"
-                            title="Ver conteúdo bruto (quando disponível)"
-                          >
-                            Ver conteúdo
-                          </button>
-                        </div>
-                      </td>
+            {/* MOBILE: cards */}
+            <ul className="sm:hidden space-y-3 max-h-[60vh] overflow-auto pr-1">
+              {data.items.map((er) => (
+                <li
+                  key={er.id}
+                  className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="text-xs text-slate-400">Linha</div>
+                      <div className="text-white font-mono">{er.lineNumber}</div>
+                    </div>
+                    <div className="text-xs text-slate-400">{formatIsoToLocal(er.createdAt)}</div>
+                  </div>
+
+                  <div className="mt-2 rounded-lg bg-slate-900 px-3 py-2 text-sm">
+                    <div className="text-white/50 text-xs mb-1">Mensagem</div>
+                    <div className="text-slate-100">{er.error}</div>
+                  </div>
+
+                  <div className="mt-3 flex flex-col xs:flex-row gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void handleCopy(er.error)}
+                      className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white"
+                      title="Copiar mensagem"
+                    >
+                      Copiar mensagem
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleViewRaw(er.id)}
+                      className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-white"
+                      title="Ver conteúdo bruto (quando disponível)"
+                    >
+                      Ver conteúdo
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* DESKTOP: tabela com rolagem só no wrapper (sem barra horizontal) */}
+            <div className="hidden sm:block">
+              <TableWrapper className="max-h-[60vh] rounded-lg border border-slate-800 overflow-x-hidden">
+                <table className="w-full table-fixed text-sm">
+                  {/* Larguras previsíveis por coluna */}
+                  <colgroup>
+                    <col className="w-20" />   {/* Linha */}
+                    <col />                    {/* Mensagem (flexível) */}
+                    <col className="w-44" />   {/* Criado em */}
+                    <col className="w-52" />   {/* Ações */}
+                  </colgroup>
+
+                  <thead>
+                    <tr className="text-left text-slate-300 bg-slate-800/50">
+                      <th className="py-2 px-3">Linha</th>
+                      <th className="py-2 px-3">Mensagem</th>
+                      <th className="py-2 px-3">Criado em</th>
+                      <th className="py-2 px-3">Ações</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody>
+                    {data.items.map((er) => (
+                      <tr key={er.id} className="border-t border-slate-800 text-slate-200 align-top">
+                        <td className="py-2 px-3 font-mono">{er.lineNumber}</td>
+
+                        {/* quebra de linha para evitar overflow */}
+                        <td className="py-2 px-3 whitespace-normal break-words">
+                          {er.error}
+                        </td>
+
+                        <td className="py-2 px-3">{formatIsoToLocal(er.createdAt)}</td>
+                        <td className="py-2 px-3">
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => void handleCopy(er.error)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-white"
+                              title="Copiar mensagem"
+                            >
+                              Copiar mensagem
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleViewRaw(er.id)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-white"
+                              title="Ver conteúdo bruto (quando disponível)"
+                            >
+                              Ver conteúdo
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TableWrapper>
             </div>
+
 
             <div className="mt-3 text-slate-400 text-sm">
               Total de inconsistências:{" "}
@@ -409,3 +470,4 @@ function ErrorsModal(props: {
     </div>
   );
 }
+
