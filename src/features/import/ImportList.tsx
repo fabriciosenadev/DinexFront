@@ -57,22 +57,53 @@ export default function ImportList() {
     }
   }
 
-  async function openErrors(job: ImportJobDTO): Promise<void> {
-    setErrorsJob(job);
-    setErrorsModalOpen(true);
-    setErrorsLoadError(null);
-    setErrorsData(null);
-    setErrorsLoading(true);
+  // async function openErrors(job: ImportJobDTO): Promise<void> {
+  //   setErrorsJob(job);
+  //   setErrorsModalOpen(true);
+  //   setErrorsLoadError(null);
+  //   setErrorsData(null);
+  //   setErrorsLoading(true);
 
+  //   try {
+  //     const data: PagedResult<ImportErrorDTO> = await getImportErrors(job.id, {
+  //       page: 1,
+  //       pageSize: 50,
+  //       orderBy: "RowNumber",
+  //       desc: false,
+  //       includeRaw: false,
+  //     });
+
+  //     setErrorsData({
+  //       page: data.page,
+  //       pageSize: data.pageSize,
+  //       totalCount: data.totalCount,
+  //       items: data.items,
+  //     });
+  //   } catch (e) {
+  //     setErrorsLoadError(e instanceof Error ? e.message : "Falha ao carregar erros");
+  //   } finally {
+  //     setErrorsLoading(false);
+  //   }
+  // }
+
+  function closeErrors(): void {
+    setErrorsModalOpen(false);
+    setErrorsJob(null);
+    setErrorsData(null);
+    setErrorsLoadError(null);
+  }
+
+  async function fetchErrorsPage(jobId: string, page: number, pageSize: number) {
+    setErrorsLoading(true);
+    setErrorsLoadError(null);
     try {
-      const data: PagedResult<ImportErrorDTO> = await getImportErrors(job.id, {
-        page: 1,
-        pageSize: 50,
+      const data: PagedResult<ImportErrorDTO> = await getImportErrors(jobId, {
+        page,
+        pageSize,
         orderBy: "RowNumber",
         desc: false,
         includeRaw: false,
       });
-
       setErrorsData({
         page: data.page,
         pageSize: data.pageSize,
@@ -86,12 +117,22 @@ export default function ImportList() {
     }
   }
 
-  function closeErrors(): void {
-    setErrorsModalOpen(false);
-    setErrorsJob(null);
-    setErrorsData(null);
-    setErrorsLoadError(null);
+  async function openErrors(job: ImportJobDTO): Promise<void> {
+    setErrorsJob(job);
+    setErrorsModalOpen(true);
+    await fetchErrorsPage(job.id, 1, 10); // página inicial
   }
+
+  // handlers que o modal chama
+  const handleErrorsChangePage = async (page: number) => {
+    if (!errorsJob || !errorsData) return;
+    await fetchErrorsPage(errorsJob.id, page, errorsData.pageSize);
+  };
+
+  const handleErrorsChangePageSize = async (size: number) => {
+    if (!errorsJob) return;
+    await fetchErrorsPage(errorsJob.id, 1, size); // reset page
+  };
 
   return (
     <div className="w-full bg-slate-900 shadow-md rounded-2xl px-4 py-6 sm:p-6">
@@ -260,7 +301,10 @@ export default function ImportList() {
         loading={errorsLoading}
         loadError={errorsLoadError}
         data={errorsData}
+        onChangePage={handleErrorsChangePage}
+        onChangePageSize={handleErrorsChangePageSize}
       />
+
     </div>
   );
 }
@@ -291,8 +335,10 @@ function ErrorsModal(props: {
   loading: boolean;
   loadError: string | null;
   data: ErrorsState | null;
+  onChangePage?: (page: number) => void;       // ← novo
+  onChangePageSize?: (size: number) => void;   // ← novo
 }) {
-  const { open, onClose, job, loading, loadError, data } = props;
+  const { open, onClose, job, loading, loadError, data, onChangePage, onChangePageSize } = props;
   if (!open) return null;
 
   async function handleCopy(text: string) {
@@ -450,9 +496,49 @@ function ErrorsModal(props: {
             </div>
 
 
-            <div className="mt-3 text-slate-400 text-sm">
-              Total de inconsistências:{" "}
-              <span className="text-white font-semibold">{data.totalCount}</span>
+            {/* paginação do modal */}
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              {/* page size */}
+              <div className="flex justify-center sm:justify-start">
+                <select
+                  disabled={loading || !data}
+                  value={data?.pageSize ?? 50}
+                  onChange={(e) => onChangePageSize?.(Number(e.target.value))}
+                  className="bg-slate-700 text-white px-2 py-1 rounded"
+                >
+                  {[10, 20, 50, 100].map((n) => (
+                    <option key={n} value={n}>{n} por página</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* pager */}
+              <div className="flex justify-center sm:justify-end items-center gap-2 flex-wrap">
+                <button
+                  className="px-3 py-1 bg-slate-700 rounded text-white disabled:opacity-50"
+                  disabled={loading || !data || data.page <= 1}
+                  onClick={() => data && onChangePage?.(data.page - 1)}
+                >
+                  Anterior
+                </button>
+                <span className="px-2 py-1 text-white font-semibold">{data?.page ?? 1}</span>
+                <button
+                  className="px-3 py-1 bg-slate-700 rounded text-white disabled:opacity-50"
+                  disabled={loading || !data || data.page * data.pageSize >= data.totalCount}
+                  onClick={() => data && onChangePage?.(data.page + 1)}
+                >
+                  Próxima
+                </button>
+
+                {data && (
+                  <span className="text-slate-300 ml-2 whitespace-nowrap text-sm">
+                    {`Exibindo ${(data.page - 1) * data.pageSize + 1}-${Math.min(
+                      data.page * data.pageSize,
+                      data.totalCount
+                    )} de ${data.totalCount}`}
+                  </span>
+                )}
+              </div>
             </div>
           </>
         )}
