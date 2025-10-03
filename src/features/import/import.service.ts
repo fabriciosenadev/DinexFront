@@ -11,12 +11,45 @@ export type PagedResult<T> = {
 };
 
 export type ImportErrorDTO = {
-  id: string;
+  id: string;              // id do erro
   importJobId: string;
   lineNumber: number;
   error: string;
   rawLineJson?: string | null;
   createdAt: string;
+  rowId?: string;          // ← id da linha
+};
+
+// Tipagem do wrapper
+export type ApiResponse<T> = {
+  notifications: { key: string; message: string }[];
+  isValid: boolean;
+  errors: string[];
+  succeded: boolean;
+  isNotFound: boolean;
+  internalServerError: boolean;
+  data: T;
+};
+
+// DTO da linha (como você mostrou)
+export type ImportRowForEditDTO = {
+  id: string;
+  importJobId: string;
+  rowNumber: number;
+  asset: string | null;
+  operationType: string | null;
+  movement: string | null;
+  date: string | null;
+  dueDate: string | null;
+  quantity: number | null;
+  unitPrice: number | null;
+  totalValue: number | null;
+  broker: string | null;
+  rawLineJson: string | null;
+  status: string | null;
+  error: string | null;
+  createdAt: string;
+  updatedAt: string | null;
 };
 
 // src/features/import/import.service.ts
@@ -65,4 +98,11 @@ export async function getImportErrors(
   }
 ): Promise<PagedResult<ImportErrorDTO>> {
   return api.get<PagedResult<ImportErrorDTO>>(`import/${jobId}/errors`, { params });
+}
+
+export async function getImportRowForEdit(
+  importId: string,
+  rowId: string
+): Promise<ImportRowForEditDTO> {
+  return api.get<ImportRowForEditDTO>(`import/${importId}/rows/${rowId}`);
 }
