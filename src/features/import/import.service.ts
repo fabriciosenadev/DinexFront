@@ -106,3 +106,13 @@ export async function getImportRowForEdit(
 ): Promise<ImportRowForEditDTO> {
   return api.get<ImportRowForEditDTO>(`import/${importId}/rows/${rowId}`);
 }
+
+// src/features/import/import.service.ts
+// ...
+export async function deleteImportJob(id: string): Promise<boolean> {
+  // Antes estava: return api.delete(`/v1/import/${id}`);
+  // Corrige para NÃO duplicar /v1
+  return api.delete<boolean>(`import/${id}`);
+}
+
+

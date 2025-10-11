@@ -1,15 +1,17 @@
 // src/features/import/ImportList.tsx
 import { useEffect, useState } from "react";
-import { getImportJobs, getImportErrors } from "./import.service";
+import { getImportJobs, getImportErrors, deleteImportJob } from "./import.service";
 import type { ImportJobDTO, ImportJobStatus } from "./import.model";
 import type { ImportErrorDTO, PagedResult } from "./import.service";
-import { ListChecks, PlayCircle, AlertTriangle, FileText, Calendar } from "lucide-react";
+import { ListChecks, PlayCircle, AlertTriangle, FileText, Calendar, Trash2 } from "lucide-react";
 import TableWrapper from "../../shared/components/layout/TableWrapper";
 import { ErrorsModal, type ErrorsState } from "./ImportErrorsModal";
 import { formatIsoToLocal } from "./import.helpers";
 import RowEditModal from "./ImportRowEditModal";
+import { notification } from "../../shared/services/notification";
 
-
+// 👇 novo: hook de confirmação
+import { useConfirm } from "../../shared/components/ui/useConfirm";
 
 export default function ImportList() {
   const [items, setItems] = useState<ImportJobDTO[]>([]);
@@ -17,6 +19,7 @@ export default function ImportList() {
   const [error, setError] = useState<string | null>(null);
 
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // modal de erros
   const [errorsModalOpen, setErrorsModalOpen] = useState(false);
@@ -28,9 +31,15 @@ export default function ImportList() {
   const [rowEditOpen, setRowEditOpen] = useState(false);
   const [rowEditRowId, setRowEditRowId] = useState<string | null>(null);
 
-  useEffect(() => {
-    void reload();
-  }, []);
+  // 👇 novo: instancia o confirm com presets de “ação destrutiva”
+  const { confirm, ConfirmDialogPortal } = useConfirm({
+    title: "Excluir importação",
+    confirmLabel: "Excluir",
+    cancelLabel: "Cancelar",
+    variant: "danger",
+  });
+
+  useEffect(() => { void reload(); }, []);
 
   async function reload(): Promise<void> {
     try {
@@ -55,6 +64,34 @@ export default function ImportList() {
       console.error(e);
     } finally {
       setProcessingId(null);
+    }
+  }
+
+  // 👇 atualizado: usa o hook de confirmação
+  async function handleDelete(job: ImportJobDTO) {
+    const ok = await confirm(
+      <>
+        Tem certeza que deseja excluir <span className="font-semibold">{job.fileName}</span>?
+        <br />
+        <span className="text-slate-400 text-sm">Esta ação é irreversível.</span>
+      </>
+    );
+    if (!ok) return;
+
+    try {
+      setDeletingId(job.id);
+      const success = await deleteImportJob(job.id);
+      if (success) {
+        notification.success("Importação excluída.");
+        await reload();
+      } else {
+        notification.warning("Não foi possível excluir a importação.");
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Falha ao excluir importação.";
+      notification.error(msg);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -92,10 +129,9 @@ export default function ImportList() {
   async function openErrors(job: ImportJobDTO): Promise<void> {
     setErrorsJob(job);
     setErrorsModalOpen(true);
-    await fetchErrorsPage(job.id, 1, 10); // página inicial
+    await fetchErrorsPage(job.id, 1, 10);
   }
 
-  // handlers que o modal chama
   const handleErrorsChangePage = async (page: number) => {
     if (!errorsJob || !errorsData) return;
     await fetchErrorsPage(errorsJob.id, page, errorsData.pageSize);
@@ -103,12 +139,11 @@ export default function ImportList() {
 
   const handleErrorsChangePageSize = async (size: number) => {
     if (!errorsJob) return;
-    await fetchErrorsPage(errorsJob.id, 1, size); // reset page
+    await fetchErrorsPage(errorsJob.id, 1, size);
   };
 
   function openRowEdit(rowId?: string) {
     if (!errorsJob || !rowId) return;
-    // fecha modal de erros e abre o de edição
     setErrorsModalOpen(false);
     setRowEditRowId(rowId);
     setRowEditOpen(true);
@@ -139,12 +174,10 @@ export default function ImportList() {
               const remainingValid = Math.max(0, total - imported - errorsCount);
               const canProcess =
                 remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
+              const canDelete = deletingId !== row.id && row.status !== "Processando";
 
               return (
-                <li
-                  key={row.id}
-                  className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50"
-                >
+                <li key={row.id} className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50">
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="text-white font-semibold flex items-center gap-2">
@@ -158,7 +191,6 @@ export default function ImportList() {
                         <span>{formatIsoToLocal(row.uploadedAt)}</span>
                       </div>
                     </div>
-
                     <StatusPill value={row.status} />
                   </div>
 
@@ -198,13 +230,24 @@ export default function ImportList() {
                       <AlertTriangle className="w-4 h-4" />
                       Revisar inconsistências
                     </button>
+
+                    <button
+                      type="button"
+                      disabled={!canDelete}
+                      onClick={() => void handleDelete(row)}
+                      className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={row.status === "Processando" ? "Não é possível excluir durante o processamento" : "Excluir importação"}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {deletingId === row.id ? "Excluindo…" : "Excluir"}
+                    </button>
                   </div>
                 </li>
               );
             })}
           </ul>
 
-          {/* DESKTOP: tabela dentro do wrapper (rolagem só do wrapper) */}
+          {/* DESKTOP: tabela */}
           <div className="hidden sm:block">
             <TableWrapper>
               <table className="min-w-[980px] w-full text-sm">
@@ -227,6 +270,7 @@ export default function ImportList() {
                     const remainingValid = Math.max(0, total - imported - errorsCount);
                     const canProcess =
                       remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
+                    const canDelete = deletingId !== row.id && row.status !== "Processando";
 
                     return (
                       <tr key={row.id} className="border-t border-slate-800 text-slate-200">
@@ -262,6 +306,17 @@ export default function ImportList() {
                               <AlertTriangle className="w-4 h-4" />
                               Revisar inconsistências
                             </button>
+
+                            <button
+                              type="button"
+                              disabled={!canDelete}
+                              onClick={() => void handleDelete(row)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-red-600/80 hover:bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={row.status === "Processando" ? "Não é possível excluir durante o processamento" : "Excluir importação"}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              {deletingId === row.id ? "Excluindo…" : "Excluir"}
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -295,6 +350,8 @@ export default function ImportList() {
         />
       )}
 
+      {/* 👇 Renderize o portal do diálogo uma única vez */}
+      {ConfirmDialogPortal}
     </div>
   );
 }
@@ -309,4 +366,3 @@ function StatusPill({ value }: { value: ImportJobStatus }) {
   const cls = map[value] ?? "bg-slate-600/30 text-slate-300";
   return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${cls}`}>{value}</span>;
 }
-
