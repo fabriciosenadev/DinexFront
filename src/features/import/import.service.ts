@@ -57,24 +57,18 @@ export type UploadResponse = { data: string }; // ou { id: string }
 
 export async function uploadB3Statement(file: File): Promise<UploadResponse> {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", file); // o backend espera "file"
 
-  const res = await fetch("/v1/ImportJobs/b3", {
-    method: "POST",
-    body: form,
-  });
+  // O api.post já:
+  // - injeta Authorization: Bearer <token>
+  // - NÃO define Content-Type se for FormData (evita quebrar o boundary)
+  // - desmembra envelope { data }
+  const id = await api.post<string, FormData>("Import/b3/upload", form);
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Falha no upload (${res.status}) ${body}`);
-  }
-
-  // **Escolha um formato e mantenha. Exemplo usando { data: string }**
-  const json = await res.json() as { data?: string; id?: string; };
-  const data = json.data ?? json.id;
-  if (!data) throw new Error("Resposta do servidor sem 'data' ou 'id'.");
-  return { data };
+  // Se quiser manter a assinatura { data: string }:
+  return { data: id };
 }
+
 
 
 export async function getImportJobs(params?: {

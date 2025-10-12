@@ -33,10 +33,6 @@ export function ErrorsModal(props: {
         }
     }
 
-    async function handleViewRaw(errorId: string) {
-        console.log("Ver conteúdo bruto do erro", errorId);
-    }
-
     function makeErrKey(er: ImportErrorDTO, idx: number) {
         // If backend later adds a real errorId, prefer it:
         const anyEr = er as unknown as { errorId?: string };
@@ -119,8 +115,8 @@ export function ErrorsModal(props: {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => void handleViewRaw(er.id)}
-                                            className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-white"
+                                            onClick={() => void onOpenRowEdit?.(er.id)}
+                                            className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white"
                                             title="Ver conteúdo bruto (quando disponível)"
                                         >
                                             Ver conteúdo

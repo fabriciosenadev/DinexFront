@@ -6,14 +6,16 @@ import type { ImportErrorDTO, PagedResult } from "./import.service";
 import { ListChecks, PlayCircle, AlertTriangle, FileText, Calendar, Trash2 } from "lucide-react";
 import TableWrapper from "../../shared/components/layout/TableWrapper";
 import { ErrorsModal, type ErrorsState } from "./ImportErrorsModal";
-import { formatIsoToLocal } from "./import.helpers";
+import { formatIsoToLocal, formatPeriodUtcToLocal } from "./import.helpers";
 import RowEditModal from "./ImportRowEditModal";
 import { notification } from "../../shared/services/notification";
 
 // 👇 novo: hook de confirmação
 import { useConfirm } from "../../shared/components/ui/useConfirm";
 
-export default function ImportList() {
+type ImportListProps = { refreshKey?: number };
+
+export default function ImportList({ refreshKey = 0 }: ImportListProps) {
   const [items, setItems] = useState<ImportJobDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,8 @@ export default function ImportList() {
     variant: "danger",
   });
 
-  useEffect(() => { void reload(); }, []);
+  useEffect(() => { void reload(); }, []); // load inicial
+  useEffect(() => { void reload(); }, [refreshKey]); // ← reage ao sucesso do form
 
   async function reload(): Promise<void> {
     try {
@@ -190,6 +193,11 @@ export default function ImportList() {
                         <Calendar className="w-3.5 h-3.5" />
                         <span>{formatIsoToLocal(row.uploadedAt)}</span>
                       </div>
+                      {/* dentro do card mobile, logo abaixo de "Enviado em" */}
+                      <div className="text-xs text-slate-400 flex items-center gap-2 mt-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>Período: {formatPeriodUtcToLocal(row.periodStartUtc, row.periodEndUtc)}</span>
+                      </div>
                     </div>
                     <StatusPill value={row.status} />
                   </div>
@@ -255,6 +263,7 @@ export default function ImportList() {
                   <tr className="text-left text-slate-300">
                     <th className="py-2 px-3">ID</th>
                     <th className="py-2 px-3">Arquivo</th>
+                    <th className="py-2 px-3">Período</th>
                     <th className="py-2 px-3">Enviado em</th>
                     <th className="py-2 px-3">Status</th>
                     <th className="py-2 px-3">Importadas</th>
@@ -280,6 +289,9 @@ export default function ImportList() {
                             {row.fileName}
                           </span>
                         </td>
+                        <td className="py-2 px-3">
+                          {formatPeriodUtcToLocal(row.periodStartUtc, row.periodEndUtc)}
+                        </td>                        
                         <td className="py-2 px-3">{formatIsoToLocal(row.uploadedAt)}</td>
                         <td className="py-2 px-3"><StatusPill value={row.status} /></td>
                         <td className="py-2 px-3">{imported}/{total}</td>
