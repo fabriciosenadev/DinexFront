@@ -9,6 +9,8 @@ export interface ImportJobDTO {
   totalRows: number;
   importedRows: number;
   errorsCount: number;
+  periodStartUtc?: string | null;
+  periodEndUtc?: string | null;
 }
 
 export interface PagedResult<T> {

@@ -3,7 +3,11 @@ import { useRef, useState } from "react";
 import { uploadB3Statement } from "./import.service";
 import { Upload } from "lucide-react";
 
-export default function ImportForm() {
+type ImportFormProps = {
+  onSuccess?: (id: string) => void;
+};
+
+export default function ImportForm({ onSuccess }: ImportFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -27,6 +31,7 @@ export default function ImportForm() {
     try {
       const result = await uploadB3Statement(file);
       setSuccess("Arquivo enviado com sucesso! ID: " + result.data);
+      onSuccess?.(result.data);
       setFile(null);
       // limpa o input visivelmente
       if (fileInputRef.current) fileInputRef.current.value = "";
