@@ -28,3 +28,38 @@ export interface ImportErrorDTO {
   rawLineJson?: string | null;
   createdAt: string;
 }
+
+export const BrokerResolutionMode = {
+  FromScreen: 1,
+  FromFile: 2,
+} as const;
+
+export type BrokerResolutionMode =
+  (typeof BrokerResolutionMode)[keyof typeof BrokerResolutionMode];
+
+// ===== DTOs usados no modal/serviço =====
+export type WalletDTO = { id: string; name: string };
+export type BrokerDTO = { id: string; name: string };
+
+// 🌱 novo: request mínimo que o backend aceita
+export type ProcessImportJobRequest = {
+  walletId: string;
+  brokerMode: BrokerResolutionMode;
+  brokerId?: string | null;
+};
+
+// Mantém o report se você quiser usar depois
+export type ProcessReportDTO = {
+  importJobId: string;
+  startedAt: string;
+  finishedAt: string;
+  processed: number;
+  skipped: number;
+  errors: number;
+  byType: Record<string, { processed: number; skipped: number; errors: number }>;
+  missing: {
+    assets: { ticker: string; count: number }[];
+    brokers: { broker: string; count: number }[];
+    walletForBroker: string[];
+  };
+};

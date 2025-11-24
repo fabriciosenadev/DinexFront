@@ -1,7 +1,7 @@
 // src/features/import/ImportList.tsx
 import { useEffect, useState } from "react";
-import { getImportJobs, getImportErrors, deleteImportJob } from "./import.service";
-import type { ImportJobDTO, ImportJobStatus } from "./import.model";
+import { getImportJobs, getImportErrors, deleteImportJob, processImportJob } from "./import.service";
+import type { ImportJobDTO, ImportJobStatus, ProcessImportJobRequest } from "./import.model";
 import type { ImportErrorDTO, PagedResult } from "./import.service";
 import { ListChecks, PlayCircle, AlertTriangle, FileText, Calendar, Trash2 } from "lucide-react";
 import TableWrapper from "../../shared/components/layout/TableWrapper";
@@ -12,6 +12,9 @@ import { notification } from "../../shared/services/notification";
 
 // 👇 novo: hook de confirmação
 import { useConfirm } from "../../shared/components/ui/useConfirm";
+import { ProcessJobModal } from "./ProcessJobModal";
+import { getWallets } from "../Wallet/wallet.service";
+import { getBrokers } from "../Broker/brokers.service";
 
 type ImportListProps = { refreshKey?: number };
 
@@ -32,6 +35,9 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
 
   const [rowEditOpen, setRowEditOpen] = useState(false);
   const [rowEditRowId, setRowEditRowId] = useState<string | null>(null);
+
+  const [processOpen, setProcessOpen] = useState(false);
+  const [processJobId, setProcessJobId] = useState<string | null>(null);
 
   // 👇 novo: instancia o confirm com presets de “ação destrutiva”
   const { confirm, ConfirmDialogPortal } = useConfirm({
@@ -57,17 +63,25 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
     }
   }
 
+  // async function handleProcessValid(jobId: string): Promise<void> {
+  //   try {
+  //     setProcessJobId(jobId);
+  //     setProcessingId(jobId);
+  //     setProcessOpen(true);
+  //     // TODO: processar válidas
+  //     // await processImportJobValidRows(jobId);
+  //     // await reload();
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //     setProcessingId(null);
+  //   }
+  // }
+
   async function handleProcessValid(jobId: string): Promise<void> {
-    try {
-      setProcessingId(jobId);
-      // TODO: processar válidas
-      // await processImportJobValidRows(jobId);
-      // await reload();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setProcessingId(null);
-    }
+    setProcessJobId(jobId);
+    setProcessingId(jobId);
+    setProcessOpen(true);
   }
 
   // 👇 atualizado: usa o hook de confirmação
@@ -152,6 +166,19 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
     setRowEditOpen(true);
   }
 
+  async function handleSubmitProcess(jobId: string, body: ProcessImportJobRequest) {
+    try {
+      await processImportJob(jobId, body);
+      notification.success("Processamento iniciado/concluído.");
+      setProcessOpen(false);
+      setProcessJobId(null);
+      await reload();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Falha ao processar importação.";
+      notification.error(msg);
+    }
+  }
+
   return (
     <div className="w-full bg-slate-900 shadow-md rounded-2xl px-4 py-6 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
@@ -174,10 +201,19 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
               const total = row.totalRows ?? 0;
               const imported = row.importedRows ?? 0;
               const errorsCount = row.errorsCount ?? 0;
-              const remainingValid = Math.max(0, total - imported - errorsCount);
+
+              const remainingValid = Math.max(0, total - errorsCount);
+
               const canProcess =
-                remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
-              const canDelete = deletingId !== row.id && row.status !== "Processando";
+                remainingValid > 0 &&
+                row.status !== "Processando" &&
+                processingId !== row.id &&
+                deletingId !== row.id;
+
+              const canDelete =
+                deletingId !== row.id &&
+                row.status !== "Processando" &&
+                processingId !== row.id;
 
               return (
                 <li key={row.id} className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50">
@@ -276,10 +312,19 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                     const total = row.totalRows ?? 0;
                     const imported = row.importedRows ?? 0;
                     const errorsCount = row.errorsCount ?? 0;
-                    const remainingValid = Math.max(0, total - imported - errorsCount);
+
+                    const remainingValid = Math.max(0, total - errorsCount);
+
                     const canProcess =
-                      remainingValid > 0 && row.status !== "Processando" && processingId !== row.id;
-                    const canDelete = deletingId !== row.id && row.status !== "Processando";
+                      remainingValid > 0 &&
+                      row.status !== "Processando" &&
+                      processingId !== row.id &&
+                      deletingId !== row.id;
+
+                    const canDelete =
+                      deletingId !== row.id &&
+                      row.status !== "Processando" &&
+                      processingId !== row.id;
 
                     return (
                       <tr key={row.id} className="border-t border-slate-800 text-slate-200">
@@ -291,7 +336,7 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                         </td>
                         <td className="py-2 px-3">
                           {formatPeriodUtcToLocal(row.periodStartUtc, row.periodEndUtc)}
-                        </td>                        
+                        </td>
                         <td className="py-2 px-3">{formatIsoToLocal(row.uploadedAt)}</td>
                         <td className="py-2 px-3"><StatusPill value={row.status} /></td>
                         <td className="py-2 px-3">{imported}/{total}</td>
@@ -340,6 +385,15 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
           </div>
         </>
       )}
+
+      <ProcessJobModal
+        open={processOpen}
+        jobId={processJobId}
+        onClose={() => { setProcessOpen(false); setProcessJobId(null); }}
+        onSubmit={handleSubmitProcess}
+        loadWallets={getWallets}
+        loadBrokers={getBrokers}
+      />
 
       <ErrorsModal
         open={errorsModalOpen}

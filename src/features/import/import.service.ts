@@ -1,6 +1,11 @@
 // src/features/import/import.service.ts
 import { api } from "../../shared/services/api";
-import type { ImportJobDTO } from "./import.model";
+import type {
+  ImportJobDTO,
+  ProcessImportJobRequest,
+  ProcessReportDTO,
+} from "./import.model";
+
 
 // ✅ tipos necessários pro endpoint de erros
 export type PagedResult<T> = {
@@ -109,4 +114,14 @@ export async function deleteImportJob(id: string): Promise<boolean> {
   return api.delete<boolean>(`import/${id}`);
 }
 
-
+// POST /v1/import/{id}/process
+export async function processImportJob(
+  jobId: string,
+  body: ProcessImportJobRequest
+): Promise<ProcessReportDTO> {
+  // Controller: [HttpPost("{id:guid}/process")] => /v1/import/{id}/process
+  return api.post<ProcessReportDTO, ProcessImportJobRequest>(
+    `import/${jobId}/process`,
+    body
+  );
+}
