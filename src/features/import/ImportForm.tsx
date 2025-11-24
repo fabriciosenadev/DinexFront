@@ -51,7 +51,7 @@ export default function ImportForm({ onSuccess }: ImportFormProps) {
       </div>
 
       <p className="text-slate-400 mb-6 text-sm">
-        Selecione o arquivo <span className="font-semibold">.xlsx</span> exportado do extrato de negociações da B3 para importar suas operações.
+        Selecione o arquivo <span className="font-semibold">.xlsx</span> exportado do extrato de movimentações da B3 para importar suas operações.
       </p>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
