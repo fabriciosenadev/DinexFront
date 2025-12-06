@@ -11,6 +11,9 @@ export interface ImportJobDTO {
   errorsCount: number;
   periodStartUtc?: string | null;
   periodEndUtc?: string | null;
+  totalTradeRows?: number | null;
+  processedTradeRows?: number | null;
+  remainingTradeRows?: number | null;
 }
 
 export interface PagedResult<T> {

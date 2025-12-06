@@ -63,21 +63,6 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
     }
   }
 
-  // async function handleProcessValid(jobId: string): Promise<void> {
-  //   try {
-  //     setProcessJobId(jobId);
-  //     setProcessingId(jobId);
-  //     setProcessOpen(true);
-  //     // TODO: processar válidas
-  //     // await processImportJobValidRows(jobId);
-  //     // await reload();
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     setProcessingId(null);
-  //   }
-  // }
-
   async function handleProcessValid(jobId: string): Promise<void> {
     setProcessJobId(jobId);
     setProcessingId(jobId);
@@ -202,10 +187,15 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
               const imported = row.importedRows ?? 0;
               const errorsCount = row.errorsCount ?? 0;
 
-              const remainingValid = Math.max(0, total - errorsCount);
+              // *** NOVO: usa campos de trade vindos do backend
+              const totalTrades = row.totalTradeRows ?? 0;
+              const processedTrades = row.processedTradeRows ?? 0;
+              const remainingTrades =
+                row.remainingTradeRows ??
+                Math.max(0, totalTrades - processedTrades);
 
               const canProcess =
-                remainingValid > 0 &&
+                remainingTrades > 0 &&
                 row.status !== "Processando" &&
                 processingId !== row.id &&
                 deletingId !== row.id;
@@ -248,8 +238,9 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                       <div className="text-white">{errorsCount}</div>
                     </div>
                     <div className="rounded-lg bg-slate-900 px-3 py-2">
-                      <div className="text-white/50 text-xs">Restantes</div>
-                      <div className="text-white">{remainingValid}</div>
+                      {/* *** rótulo ajustado pra refletir o que é de fato processável hoje */}
+                      <div className="text-white/50 text-xs">Trades pendentes</div>
+                      <div className="text-white">{remainingTrades}</div>
                     </div>
                   </div>
 
@@ -259,10 +250,10 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                       disabled={!canProcess}
                       onClick={() => void handleProcessValid(row.id)}
                       className="inline-flex justify-center items-center gap-1 px-3 py-2 rounded-lg bg-green-600/80 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={canProcess ? "Processar todas as linhas válidas" : "Nada para processar"}
+                      title={canProcess ? "Processar todas as linhas de trade pendentes" : "Nada para processar"}
                     >
                       <PlayCircle className="w-4 h-4" />
-                      {processingId === row.id ? "Processando…" : "Processar válidas"}
+                      {processingId === row.id ? "Processando…" : "Processar trades"}
                     </button>
 
                     <button
@@ -304,6 +295,8 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                     <th className="py-2 px-3">Status</th>
                     <th className="py-2 px-3">Importadas</th>
                     <th className="py-2 px-3">Erros</th>
+                    {/* *** nova coluna explícita para trades pendentes (opcional mas ajuda a clareza) */}
+                    <th className="py-2 px-3">Trades pendentes</th>
                     <th className="py-2 px-3">Ações</th>
                   </tr>
                 </thead>
@@ -313,10 +306,14 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                     const imported = row.importedRows ?? 0;
                     const errorsCount = row.errorsCount ?? 0;
 
-                    const remainingValid = Math.max(0, total - errorsCount);
+                    const totalTrades = row.totalTradeRows ?? 0;
+                    const processedTrades = row.processedTradeRows ?? 0;
+                    const remainingTrades =
+                      row.remainingTradeRows ??
+                      Math.max(0, totalTrades - processedTrades);
 
                     const canProcess =
-                      remainingValid > 0 &&
+                      remainingTrades > 0 &&
                       row.status !== "Processando" &&
                       processingId !== row.id &&
                       deletingId !== row.id;
@@ -341,6 +338,7 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                         <td className="py-2 px-3"><StatusPill value={row.status} /></td>
                         <td className="py-2 px-3">{imported}/{total}</td>
                         <td className="py-2 px-3">{errorsCount}</td>
+                        <td className="py-2 px-3">{remainingTrades}</td>
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
                             <button
@@ -348,10 +346,10 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                               disabled={!canProcess}
                               onClick={() => void handleProcessValid(row.id)}
                               className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-green-600/80 hover:bg-green-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                              title={canProcess ? "Processar todas as linhas válidas" : "Nada para processar"}
+                              title={canProcess ? "Processar todas as linhas de trade pendentes" : "Nada para processar"}
                             >
                               <PlayCircle className="w-4 h-4" />
-                              {processingId === row.id ? "Processando…" : "Processar válidas"}
+                              {processingId === row.id ? "Processando…" : "Processar trades"}
                             </button>
 
                             <button
