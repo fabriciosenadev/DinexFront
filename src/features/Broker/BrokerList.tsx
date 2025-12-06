@@ -70,7 +70,9 @@ export default function BrokerList() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
                                         <div className="text-white font-semibold">{b.name}</div>
-                                        <div className="text-white/60 text-sm">{maskCnpj(b.cnpj)}</div>
+                                        <div className="text-white/60 text-sm">
+                                            CNPJ: {b.cnpj ? maskCnpj(b.cnpj) : "-"}
+                                        </div>
                                     </div>
 
                                     <div className="flex gap-2">
@@ -132,7 +134,7 @@ export default function BrokerList() {
                                             className="border-t border-slate-700 hover:bg-slate-700/40"
                                         >
                                             <td className="p-3 whitespace-nowrap">{b.name}</td>
-                                            <td className="p-3 whitespace-nowrap">{maskCnpj(b.cnpj)}</td>
+                                            <td className="p-3 whitespace-nowrap">{b.cnpj ? maskCnpj(b.cnpj) : "-"}</td>
                                             <td className="p-3 whitespace-nowrap">
                                                 {b.website ? (
                                                     <a

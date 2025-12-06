@@ -3,8 +3,8 @@ import { api } from "../../shared/services/api";
 export interface BrokerDTO {
   id: string;
   name: string;
-  cnpj: string;
-  website?: string;
+  cnpj?: string | null;
+  website?: string | null;
 }
 
 export interface CreateBrokerCommand {
