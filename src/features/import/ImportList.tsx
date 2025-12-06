@@ -202,8 +202,9 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
 
               const canDelete =
                 deletingId !== row.id &&
+                processingId !== row.id &&
                 row.status !== "Processando" &&
-                processingId !== row.id;
+                (row.processedTradeRows ?? 0) === 0;
 
               return (
                 <li key={row.id} className="rounded-xl bg-slate-800 p-3 shadow border border-slate-700/50">
@@ -217,7 +218,7 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
                       </div>
                       <div className="text-xs text-slate-400 flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>{formatIsoToLocal(row.uploadedAt)}</span>
+                        <span>Enviado em: {formatIsoToLocal(row.uploadedAt)}</span>
                       </div>
                       {/* dentro do card mobile, logo abaixo de "Enviado em" */}
                       <div className="text-xs text-slate-400 flex items-center gap-2 mt-1">
@@ -320,8 +321,9 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
 
                     const canDelete =
                       deletingId !== row.id &&
+                      processingId !== row.id &&
                       row.status !== "Processando" &&
-                      processingId !== row.id;
+                      (row.processedTradeRows ?? 0) === 0;
 
                     return (
                       <tr key={row.id} className="border-t border-slate-800 text-slate-200">
