@@ -38,6 +38,9 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
 
   const [processOpen, setProcessOpen] = useState(false);
   const [processJobId, setProcessJobId] = useState<string | null>(null);
+  const [processingFeedbackOpen, setProcessingFeedbackOpen] = useState(false);
+  const [processingFeedbackJobName, setProcessingFeedbackJobName] = useState<string | null>(null);
+
 
   // 👇 novo: instancia o confirm com presets de “ação destrutiva”
   const { confirm, ConfirmDialogPortal } = useConfirm({
@@ -151,16 +154,69 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
     setRowEditOpen(true);
   }
 
+  function ProcessingModal(props: { open: boolean; fileName?: string | null }) {
+    if (!props.open) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70">
+        <div className="bg-slate-800 rounded-2xl px-6 py-5 shadow-xl w-full max-w-sm text-center border border-slate-700">
+          <div className="mb-3 flex justify-center">
+            {/* Spinner simples com Tailwind */}
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-500 border-t-transparent" />
+          </div>
+          <h3 className="text-lg font-semibold text-white mb-1">
+            Processando importação…
+          </h3>
+          {props.fileName && (
+            <p className="text-xs text-slate-400 mb-1 truncate" title={props.fileName}>
+              Arquivo: {props.fileName}
+            </p>
+          )}
+          <p className="text-sm text-slate-300">
+            Isso pode levar alguns instantes. 
+            Não feche a página até o processamento terminar.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // async function handleSubmitProcess(jobId: string, body: ProcessImportJobRequest) {
+  //   try {
+  //     await processImportJob(jobId, body);
+  //     notification.success("Processamento iniciado/concluído.");
+  //     setProcessOpen(false);
+  //     setProcessJobId(null);
+  //     await reload();
+  //   } catch (e) {
+  //     const msg = e instanceof Error ? e.message : "Falha ao processar importação.";
+  //     notification.error(msg);
+  //   }
+  // }
   async function handleSubmitProcess(jobId: string, body: ProcessImportJobRequest) {
     try {
-      await processImportJob(jobId, body);
-      notification.success("Processamento iniciado/concluído.");
+      // 1) fecha o modal de configuração
       setProcessOpen(false);
-      setProcessJobId(null);
+
+      // 2) abre o modal de "Processando..."
+      const job = items.find(j => j.id === jobId);
+      setProcessingFeedbackJobName(job?.fileName ?? null);
+      setProcessingFeedbackOpen(true);
+
+      // 3) chama a API
+      await processImportJob(jobId, body);
+
+      notification.success("Processamento concluído com sucesso.");
       await reload();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Falha ao processar importação.";
       notification.error(msg);
+    } finally {
+      // 4) fecha o modal de "Processando..." e limpa estados
+      setProcessingFeedbackOpen(false);
+      setProcessingFeedbackJobName(null);
+      setProcessingId(null);
+      setProcessJobId(null);
     }
   }
 
@@ -393,6 +449,11 @@ export default function ImportList({ refreshKey = 0 }: ImportListProps) {
         onSubmit={handleSubmitProcess}
         loadWallets={getWallets}
         loadBrokers={getBrokers}
+      />
+
+      <ProcessingModal
+        open={processingFeedbackOpen}
+        fileName={processingFeedbackJobName}
       />
 
       <ErrorsModal
