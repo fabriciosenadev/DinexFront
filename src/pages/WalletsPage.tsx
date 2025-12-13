@@ -7,6 +7,8 @@ import PageLayout from "../shared/components/layout/PageLayout";
 import PageHeader from "../shared/components/layout/PageHeader";
 import TableWrapper from "../shared/components/layout/TableWrapper";
 import { useAuth } from "../shared/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { LineChart } from "lucide-react"; // icone opcional
 
 export default function WalletsPage() {
     const [wallets, setWallets] = useState<WalletDTO[]>([]);
@@ -31,6 +33,10 @@ export default function WalletsPage() {
     useEffect(() => {
         fetchWallets();
     }, []);
+
+    //#region position
+    const navigate = useNavigate();
+    //#endregion
 
     const handleEdit = (wallet: WalletDTO) => {
         setEditWallet(wallet);
@@ -102,6 +108,13 @@ export default function WalletsPage() {
                                         <div className="text-white font-semibold">{w.name}</div>
                                         <div className="flex gap-2">
                                             <button
+                                                onClick={() => navigate(`/wallets/${w.id}/positions`)}
+                                                className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white"
+                                                aria-label="Ver posições"
+                                            >
+                                                <LineChart className="w-4 h-4" />
+                                            </button>
+                                            <button
                                                 onClick={() => handleEdit(w)}
                                                 className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white"
                                                 aria-label="Editar carteira"
@@ -152,6 +165,13 @@ export default function WalletsPage() {
                                                 <td className="p-3">{w.description || "-"}</td>
                                                 <td className="p-3">
                                                     <div className="flex justify-center gap-2">
+                                                        <button
+                                                            onClick={() => navigate(`/wallets/${w.id}/positions`)}
+                                                            className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white"
+                                                            aria-label="Ver posições"
+                                                        >
+                                                            <LineChart className="w-4 h-4" />
+                                                        </button>
                                                         <button
                                                             onClick={() => handleEdit(w)}
                                                             className="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-white font-medium"

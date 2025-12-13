@@ -8,6 +8,7 @@ import ReportsPage from "./pages/ReportsPage";
 // import SettingsPage from "./pages/SettingsPage";
 import ImportPage from "./pages/ImportPage";
 import SettingsHome from "./pages/SettingsHome";
+import WalletPositionsPage from "./pages/WalletPositionsPage";
 
 export const publicRoutes = [
   { path: "/", element: <Login /> },
@@ -19,6 +20,8 @@ export const privateRoutes = [
   { path: "/operations", element: <OperationsPage /> },
   { path: "/import", element: <ImportPage /> },
   { path: "/wallets", element: <WalletsPage /> },
+
+  { path: "/wallets/:walletId/positions", element: <WalletPositionsPage /> },
 
   { path: "/reports", element: <ReportsPage /> },
 
