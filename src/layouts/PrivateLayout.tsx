@@ -1,14 +1,14 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../shared/hooks/useAuth";
 import { notification } from "../shared/services/notification";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { MENU } from "./PrivateMenu";
 
 export default function PrivateLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // drawer mobile
+  const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = () => {
@@ -19,13 +19,23 @@ export default function PrivateLayout() {
     setTimeout(() => navigate("/"), 200);
   };
 
+  // (Opcional, mas recomendado) trava o scroll do body quando drawer mobile estiver aberto
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="h-screen overflow-hidden flex bg-slate-950">
       {/* Sidebar (desktop) */}
       <aside
         className="
-          bg-slate-900 text-white w-60 flex-shrink-0 h-screen hidden sm:flex flex-col 
-          justify-between py-6 px-4 relative z-20 overflow-y-auto
+          bg-slate-900 text-white w-60 flex-shrink-0 hidden sm:flex flex-col
+          justify-between py-6 px-4 z-20
+          h-screen overflow-y-auto
         "
       >
         <div>
@@ -37,7 +47,6 @@ export default function PrivateLayout() {
                   <NavLink
                     to={item.to}
                     className="hover:bg-slate-800 rounded px-3 py-2 flex items-center"
-                    onClick={() => setOpen(false)}
                   >
                     {item.icon}
                     {item.label}
@@ -95,6 +104,7 @@ export default function PrivateLayout() {
                 </ul>
               </nav>
             </div>
+
             <button
               onClick={() => {
                 setOpen(false);
@@ -110,7 +120,7 @@ export default function PrivateLayout() {
       )}
 
       {/* Área de conteúdo */}
-      <div className="flex-1 min-h-screen flex flex-col min-w-0">
+      <div className="flex-1 h-screen flex flex-col min-w-0">
         {/* Topbar mobile */}
         <header className="sm:hidden fixed w-full top-0 left-0 bg-slate-900 flex items-center justify-between px-4 h-16 z-40">
           <button
@@ -126,8 +136,8 @@ export default function PrivateLayout() {
           <div />
         </header>
 
-        {/* Compensação do topbar mobile; sem gutters aqui */}
-        <main className="flex-1 pt-16 w-full min-w-0">
+        {/* Conteúdo rola aqui (não no body) */}
+        <main className="flex-1 w-full min-w-0 overflow-y-auto pt-16 sm:pt-0">
           <Outlet />
         </main>
       </div>
